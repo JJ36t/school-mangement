@@ -1,0 +1,292 @@
+{% extends 'base/base.html' %}
+
+{% block title %}تفاصيل الإشعار - {{ notification.title }} - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-bell me-2"></i>
+                تفاصيل الإشعار
+            </h2>
+            <div>
+                <a href="{% url 'notifications:edit_notification' notification.id %}" class="btn btn-warning me-2">
+                    <i class="bi bi-pencil me-2"></i>تعديل
+                </a>
+                {% if not notification.is_sent %}
+                    <a href="{% url 'notifications:send_notification' notification.id %}" class="btn btn-success me-2">
+                        <i class="bi bi-send me-2"></i>إرسال
+                    </a>
+                {% endif %}
+                <a href="{% url 'notifications:notification_list' %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-right me-2"></i>العودة للقائمة
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-bell me-2"></i>معلومات الإشعار
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <strong>العنوان:</strong>
+                            <p class="mb-0 fs-5">{{ notification.title }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <strong>نوع الإشعار:</strong>
+                            <p class="mb-0">
+                                <span class="badge bg-{% if notification.notification_type == 'urgent' %}danger{% elif notification.notification_type == 'info' %}info{% elif notification.notification_type == 'warning' %}warning{% elif notification.notification_type == 'success' %}success{% else %}secondary{% endif %} fs-6">
+                                    {{ notification.get_notification_type_display }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>نص الإشعار:</strong>
+                    <div class="border rounded p-3 bg-light">
+                        <p class="mb-0">{{ notification.message }}</p>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>نوع المستقبلين:</strong>
+                            <p class="mb-0">
+                                {% if notification.recipient_type == 'all' %}
+                                    <span class="badge bg-primary">الجميع</span>
+                                {% elif notification.recipient_type == 'students' %}
+                                    <span class="badge bg-success">الطلاب</span>
+                                {% elif notification.recipient_type == 'teachers' %}
+                                    <span class="badge bg-info">المعلمون</span>
+                                {% elif notification.recipient_type == 'parents' %}
+                                    <span class="badge bg-warning">أولياء الأمور</span>
+                                {% elif notification.recipient_type == 'specific' %}
+                                    <span class="badge bg-secondary">محدد</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>الأولوية:</strong>
+                            <p class="mb-0">
+                                {% if notification.priority == 'high' %}
+                                    <span class="badge bg-danger">عالي</span>
+                                {% elif notification.priority == 'medium' %}
+                                    <span class="badge bg-warning">متوسط</span>
+                                {% elif notification.priority == 'low' %}
+                                    <span class="badge bg-success">منخفض</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>قناة الإرسال:</strong>
+                            <p class="mb-0">
+                                <span class="badge bg-secondary">{{ notification.get_channel_display }}</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>حالة الإرسال:</strong>
+                            <p class="mb-0">
+                                {% if notification.is_sent %}
+                                    <span class="badge bg-success fs-6">
+                                        <i class="bi bi-check-circle me-1"></i>مرسل
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-warning fs-6">
+                                        <i class="bi bi-clock me-1"></i>معلق
+                                    </span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if notification.scheduled_at %}
+                <div class="mb-3">
+                    <strong>تاريخ الإرسال المجدول:</strong>
+                    <p class="mb-0">{{ notification.scheduled_at|date:"Y-m-d H:i" }}</p>
+                </div>
+                {% endif %}
+                
+                {% if notification.sent_at %}
+                <div class="mb-3">
+                    <strong>تاريخ الإرسال الفعلي:</strong>
+                    <p class="mb-0">{{ notification.sent_at|date:"Y-m-d H:i" }}</p>
+                </div>
+                {% endif %}
+                
+                {% if notification.attachments %}
+                <div class="mb-3">
+                    <strong>المرفقات:</strong>
+                    <p class="mb-0">
+                        <a href="{{ notification.attachments.url }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-paperclip me-1"></i>عرض المرفق
+                        </a>
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-people me-2"></i>المستقبلون
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if notification.recipient_type == 'all' %}
+                    <p class="text-muted">تم إرسال الإشعار لجميع المستخدمين في النظام</p>
+                {% elif notification.recipient_type == 'students' %}
+                    <p class="text-muted">تم إرسال الإشعار لجميع الطلاب</p>
+                {% elif notification.recipient_type == 'teachers' %}
+                    <p class="text-muted">تم إرسال الإشعار لجميع المعلمين</p>
+                {% elif notification.recipient_type == 'parents' %}
+                    <p class="text-muted">تم إرسال الإشعار لجميع أولياء الأمور</p>
+                {% elif notification.recipient_type == 'specific' %}
+                    <p class="text-muted">تم إرسال الإشعار لمستخدمين محددين</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-graph-up me-2"></i>تحليل الإشعار
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    {% if notification.notification_type == 'urgent' %}
+                        <div class="display-4 fw-bold text-danger">
+                            <i class="bi bi-exclamation-triangle"></i>
+                        </div>
+                        <p class="text-danger">عاجل</p>
+                    {% elif notification.notification_type == 'info' %}
+                        <div class="display-4 fw-bold text-info">
+                            <i class="bi bi-info-circle"></i>
+                        </div>
+                        <p class="text-info">معلوماتي</p>
+                    {% elif notification.notification_type == 'warning' %}
+                        <div class="display-4 fw-bold text-warning">
+                            <i class="bi bi-exclamation-circle"></i>
+                        </div>
+                        <p class="text-warning">تحذير</p>
+                    {% elif notification.notification_type == 'success' %}
+                        <div class="display-4 fw-bold text-success">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                        <p class="text-success">نجاح</p>
+                    {% else %}
+                        <div class="display-4 fw-bold text-secondary">
+                            <i class="bi bi-bell"></i>
+                        </div>
+                        <p class="text-secondary">عام</p>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <strong>الأولوية:</strong>
+                    <p class="mb-0">
+                        {% if notification.priority == 'high' %}
+                            <span class="badge bg-danger">عالي</span>
+                        {% elif notification.priority == 'medium' %}
+                            <span class="badge bg-warning">متوسط</span>
+                        {% elif notification.priority == 'low' %}
+                            <span class="badge bg-success">منخفض</span>
+                        {% endif %}
+                    </p>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>قناة الإرسال:</strong>
+                    <p class="mb-0">{{ notification.get_channel_display }}</p>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>حالة الإرسال:</strong>
+                    <p class="mb-0">
+                        {% if notification.is_sent %}
+                            <span class="text-success">تم الإرسال</span>
+                        {% else %}
+                            <span class="text-warning">معلق</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-calendar me-2"></i>معلومات إضافية
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>تاريخ الإنشاء:</strong>
+                    <p class="mb-0">{{ notification.created_at|date:"Y-m-d H:i" }}</p>
+                </div>
+                <div class="mb-3">
+                    <strong>آخر تحديث:</strong>
+                    <p class="mb-0">{{ notification.updated_at|date:"Y-m-d H:i" }}</p>
+                </div>
+                {% if notification.sent_at %}
+                <div class="mb-3">
+                    <strong>تاريخ الإرسال:</strong>
+                    <p class="mb-0">{{ notification.sent_at|date:"Y-m-d H:i" }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-tools me-2"></i>الإجراءات السريعة
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'notifications:edit_notification' notification.id %}" class="btn btn-warning">
+                        <i class="bi bi-pencil me-2"></i>تعديل الإشعار
+                    </a>
+                    {% if not notification.is_sent %}
+                        <a href="{% url 'notifications:send_notification' notification.id %}" class="btn btn-success">
+                            <i class="bi bi-send me-2"></i>إرسال الإشعار
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'notifications:notification_list' %}" class="btn btn-info">
+                        <i class="bi bi-list me-2"></i>قائمة الإشعارات
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

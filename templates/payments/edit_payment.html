@@ -1,0 +1,239 @@
+{% extends 'base/base.html' %}
+
+{% block title %}تعديل الدفعة - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<!-- Header Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-1">
+                    <i class="bi bi-pencil-square text-primary me-2"></i>
+                    تعديل الدفعة
+                </h2>
+                <p class="text-muted mb-0">تعديل معلومات الدفعة المالية</p>
+            </div>
+            <a href="{% url 'payments:payment_detail' payment.id %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-right me-2"></i>العودة للتفاصيل
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-credit-card me-2"></i>معلومات الدفعة
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" id="paymentForm">
+                    {% csrf_token %}
+                    
+                    <!-- معلومات الطالب -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-primary rounded-circle p-2 me-3">
+                                    <i class="bi bi-person text-white"></i>
+                                </div>
+                                <h6 class="text-primary mb-0 fw-bold">معلومات الطالب</h6>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" value="{{ payment.student.user.get_full_name }}" readonly>
+                                <label>الطالب</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" value="{{ payment.student.student_id }}" readonly>
+                                <label>رقم الطالب</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- تفاصيل الدفعة -->
+                    <div class="row mb-4 mt-4">
+                        <div class="col-12">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-success rounded-circle p-2 me-3">
+                                    <i class="bi bi-currency-exchange text-white"></i>
+                                </div>
+                                <h6 class="text-success mb-0 fw-bold">تفاصيل الدفعة</h6>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                {{ form.payment_type }}
+                                <label for="{{ form.payment_type.id_for_label }}">نوع الدفع *</label>
+                                {% if form.payment_type.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.payment_type.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                {{ form.amount }}
+                                <label for="{{ form.amount.id_for_label }}">المبلغ (دينار) *</label>
+                                {% if form.amount.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.amount.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                {{ form.due_date }}
+                                <label for="{{ form.due_date.id_for_label }}">تاريخ الاستحقاق *</label>
+                                {% if form.due_date.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.due_date.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                {{ form.status }}
+                                <label for="{{ form.status.id_for_label }}">الحالة *</label>
+                                {% if form.status.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.status.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                {{ form.paid_date }}
+                                <label for="{{ form.paid_date.id_for_label }}">تاريخ الدفع</label>
+                                {% if form.paid_date.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.paid_date.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                {{ form.payment_method }}
+                                <label for="{{ form.payment_method.id_for_label }}">طريقة الدفع</label>
+                                {% if form.payment_method.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.payment_method.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                {{ form.receipt_number }}
+                                <label for="{{ form.receipt_number.id_for_label }}">رقم الإيصال</label>
+                                {% if form.receipt_number.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.receipt_number.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ملاحظات -->
+                    <div class="row mb-4 mt-4">
+                        <div class="col-12">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-info rounded-circle p-2 me-3">
+                                    <i class="bi bi-chat-text text-white"></i>
+                                </div>
+                                <h6 class="text-info mb-0 fw-bold">ملاحظات إضافية</h6>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="form-floating">
+                                {{ form.notes }}
+                                <label for="{{ form.notes.id_for_label }}">ملاحظات</label>
+                                {% if form.notes.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.notes.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- أزرار التحكم -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between">
+                                <a href="{% url 'payments:payment_detail' payment.id %}" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-right me-1"></i>
+                                    إلغاء
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-lg me-1"></i>
+                                    حفظ التغييرات
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // إضافة Bootstrap classes للعناصر
+    const formElements = document.querySelectorAll('#paymentForm input, #paymentForm select, #paymentForm textarea');
+    formElements.forEach(element => {
+        if (!element.classList.contains('form-control')) {
+            element.classList.add('form-control');
+        }
+    });
+    
+    // إضافة class للـ textarea
+    const textarea = document.querySelector('#paymentForm textarea');
+    if (textarea) {
+        textarea.classList.add('form-control');
+        textarea.style.height = '100px';
+    }
+    
+    // إضافة class للـ select
+    const selects = document.querySelectorAll('#paymentForm select');
+    selects.forEach(select => {
+        select.classList.add('form-select');
+    });
+    
+    // إضافة class للـ input[type="date"]
+    const dateInputs = document.querySelectorAll('#paymentForm input[type="date"]');
+    dateInputs.forEach(input => {
+        input.classList.add('form-control');
+    });
+    
+    // إضافة class للـ input[type="number"]
+    const numberInputs = document.querySelectorAll('#paymentForm input[type="number"]');
+    numberInputs.forEach(input => {
+        input.classList.add('form-control');
+    });
+    
+    // إضافة class للـ input[type="text"]
+    const textInputs = document.querySelectorAll('#paymentForm input[type="text"]');
+    textInputs.forEach(input => {
+        input.classList.add('form-control');
+    });
+});
+</script>
+{% endblock %}

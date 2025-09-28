@@ -1,0 +1,447 @@
+{% extends 'base/base.html' %}
+
+{% block title %}لوحة تحكم المدير - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-speedometer2 me-2"></i>
+                لوحة تحكم المدير
+            </h2>
+            <div>
+                <a href="{% url 'dashboard:statistics' %}" class="btn btn-success me-2">
+                    <i class="bi bi-file-earmark-bar-graph me-2"></i>التقارير
+                </a>
+                <a href="{% url 'dashboard:statistics' %}" class="btn btn-info">
+                    <i class="bi bi-graph-up me-2"></i>التحليلات
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- إحصائيات سريعة -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ total_students }}</h4>
+                        <p class="card-text">إجمالي الطلاب</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-people display-4"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'students:student_list' %}" class="text-white text-decoration-none">
+                    <i class="bi bi-arrow-left me-1"></i>عرض التفاصيل
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ total_teachers }}</h4>
+                        <p class="card-text">إجمالي المعلمين</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-person-badge display-4"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'teachers:teacher_list' %}" class="text-white text-decoration-none">
+                    <i class="bi bi-arrow-left me-1"></i>عرض التفاصيل
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ total_subjects }}</h4>
+                        <p class="card-text">إجمالي المواد</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-book display-4"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'subjects:subject_list' %}" class="text-white text-decoration-none">
+                    <i class="bi bi-arrow-left me-1"></i>عرض التفاصيل
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ total_classes }}</h4>
+                        <p class="card-text">إجمالي الصفوف</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-building display-4"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'subjects:class_list' %}" class="text-white text-decoration-none">
+                    <i class="bi bi-arrow-left me-1"></i>عرض التفاصيل
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- إحصائيات مالية -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ total_payments }} دينار</h4>
+                        <p class="card-text">إجمالي المدفوعات</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-currency-exchange display-4"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'payments:payment_list' %}" class="text-white text-decoration-none">
+                    <i class="bi bi-arrow-left me-1"></i>عرض التفاصيل
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card bg-danger text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ pending_payments }} دينار</h4>
+                        <p class="card-text">المدفوعات المعلقة</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-clock display-4"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'payments:payment_list' %}?status=pending" class="text-white text-decoration-none">
+                    <i class="bi bi-arrow-left me-1"></i>عرض التفاصيل
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ collection_rate|floatformat:1 }}%</h4>
+                        <p class="card-text">معدل التحصيل</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-graph-up display-4"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'payments:payment_list' %}" class="text-white text-decoration-none">
+                    <i class="bi bi-arrow-left me-1"></i>عرض التفاصيل
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- إحصائيات الحضور -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-calendar-check me-2"></i>إحصائيات الحضور
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <div class="border-end">
+                            <h4 class="text-success mb-1">{{ attendance_rate|floatformat:1 }}%</h4>
+                            <small class="text-muted">معدل الحضور</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="border-end">
+                            <h4 class="text-warning mb-1">{{ late_count }}</h4>
+                            <small class="text-muted">متأخر</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <h4 class="text-danger mb-1">{{ absent_count }}</h4>
+                        <small class="text-muted">غائب</small>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'attendance:attendance_list' %}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i>عرض التفاصيل
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-award me-2"></i>إحصائيات الدرجات
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <div class="border-end">
+                            <h4 class="text-success mb-1">{{ average_grade|floatformat:1 }}</h4>
+                            <small class="text-muted">المتوسط العام</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="border-end">
+                            <h4 class="text-info mb-1">{{ excellent_students }}</h4>
+                            <small class="text-muted">متفوق</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <h4 class="text-warning mb-1">{{ weak_students }}</h4>
+                        <small class="text-muted">ضعيف</small>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'grades:grade_list' %}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i>عرض التفاصيل
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- الرسوم البيانية -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-pie-chart me-2"></i>توزيع الطلاب حسب الصف
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="studentsByGradeChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-bar-chart me-2"></i>المدفوعات الشهرية
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="monthlyPaymentsChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- الإشعارات الحديثة -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-bell me-2"></i>الإشعارات الحديثة
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if recent_notifications %}
+                    <div class="list-group list-group-flush">
+                        {% for notification in recent_notifications %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ notification.title }}</h6>
+                                    <small class="text-muted">{{ notification.message|truncatechars:50 }}</small>
+                                </div>
+                                <span class="badge bg-{% if notification.priority == 'high' %}danger{% elif notification.priority == 'medium' %}warning{% else %}success{% endif %}">
+                                    {{ notification.get_priority_display }}
+                                </span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center">لا توجد إشعارات حديثة</p>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'notifications:notification_list' %}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i>عرض جميع الإشعارات
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-activity me-2"></i>النشاطات الحديثة
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">تم إضافة طالب جديد</h6>
+                            <small class="text-muted">أحمد محمد - الصف العاشر</small>
+                        </div>
+                        <small class="text-muted">منذ ساعتين</small>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">تم تسجيل دفعة جديدة</h6>
+                            <small class="text-muted">رسوم دراسية - 2500 دينار</small>
+                        </div>
+                        <small class="text-muted">منذ 4 ساعات</small>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">تم إرسال إشعار</h6>
+                            <small class="text-muted">موعد الامتحانات النهائية</small>
+                        </div>
+                        <small class="text-muted">منذ 6 ساعات</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- الإجراءات السريعة -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-lightning me-2"></i>الإجراءات السريعة
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'students:create_student' %}" class="btn btn-primary w-100">
+                            <i class="bi bi-person-plus me-2"></i>إضافة طالب
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'teachers:create_teacher' %}" class="btn btn-success w-100">
+                            <i class="bi bi-person-badge me-2"></i>إضافة معلم
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'payments:create_payment' %}" class="btn btn-info w-100">
+                            <i class="bi bi-credit-card me-2"></i>تسجيل دفعة
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'notifications:create_notification' %}" class="btn btn-warning w-100">
+                            <i class="bi bi-bell me-2"></i>إرسال إشعار
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // رسم بياني لتوزيع الطلاب حسب الصف
+    const studentsByGradeCtx = document.getElementById('studentsByGradeChart').getContext('2d');
+    new Chart(studentsByGradeCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ students_by_grade_labels|safe }},
+            datasets: [{
+                data: {{ students_by_grade_data|safe }},
+                backgroundColor: [
+                    '#FF6384',
+                    '#36A2EB',
+                    '#FFCE56',
+                    '#4BC0C0',
+                    '#9966FF',
+                    '#FF9F40'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+    
+    // رسم بياني للمدفوعات الشهرية
+    const monthlyPaymentsCtx = document.getElementById('monthlyPaymentsChart').getContext('2d');
+    new Chart(monthlyPaymentsCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ monthly_payments_labels|safe }},
+            datasets: [{
+                label: 'المدفوعات (دينار)',
+                data: {{ monthly_payments_data|safe }},
+                backgroundColor: '#36A2EB'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

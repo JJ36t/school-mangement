@@ -1,0 +1,127 @@
+{% extends 'base/base.html' %}
+
+{% block title %}حذف الدفعة - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<!-- Header Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-1">
+                    <i class="bi bi-trash text-danger me-2"></i>
+                    حذف الدفعة
+                </h2>
+                <p class="text-muted mb-0">تأكيد حذف الدفعة المالية</p>
+            </div>
+            <a href="{% url 'payments:payment_detail' payment.id %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-right me-2"></i>العودة للتفاصيل
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    تأكيد الحذف
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-danger" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>تحذير!</strong> هل أنت متأكد من أنك تريد حذف هذه الدفعة؟ هذا الإجراء لا يمكن التراجع عنه.
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-muted">تفاصيل الدفعة:</h6>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>الطالب:</strong></td>
+                                <td>{{ payment.student.user.get_full_name }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>رقم الطالب:</strong></td>
+                                <td>{{ payment.student.student_id }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>نوع الدفع:</strong></td>
+                                <td>{{ payment.get_payment_type_display }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>المبلغ:</strong></td>
+                                <td class="text-success fw-bold">{{ payment.amount }} دينار</td>
+                            </tr>
+                            <tr>
+                                <td><strong>تاريخ الاستحقاق:</strong></td>
+                                <td>{{ payment.due_date|date:"Y-m-d" }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>الحالة:</strong></td>
+                                <td>
+                                    <span class="badge bg-{% if payment.status == 'paid' %}success{% elif payment.status == 'pending' %}warning{% elif payment.status == 'overdue' %}danger{% else %}secondary{% endif %}">
+                                        {{ payment.get_status_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted">معلومات إضافية:</h6>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>تاريخ الإنشاء:</strong></td>
+                                <td>{{ payment.created_at|date:"Y-m-d H:i" }}</td>
+                            </tr>
+                            {% if payment.paid_date %}
+                            <tr>
+                                <td><strong>تاريخ الدفع:</strong></td>
+                                <td>{{ payment.paid_date|date:"Y-m-d" }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if payment.payment_method %}
+                            <tr>
+                                <td><strong>طريقة الدفع:</strong></td>
+                                <td>{{ payment.payment_method }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if payment.receipt_number %}
+                            <tr>
+                                <td><strong>رقم الإيصال:</strong></td>
+                                <td>{{ payment.receipt_number }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if payment.notes %}
+                            <tr>
+                                <td><strong>ملاحظات:</strong></td>
+                                <td>{{ payment.notes }}</td>
+                            </tr>
+                            {% endif %}
+                        </table>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'payments:payment_detail' payment.id %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-right me-1"></i>
+                                إلغاء
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash me-1"></i>
+                                تأكيد الحذف
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

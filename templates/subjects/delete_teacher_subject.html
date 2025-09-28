@@ -1,0 +1,65 @@
+{% extends 'base/base.html' %}
+
+{% block title %}حذف تعيين المعلم - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-trash me-2"></i>
+                حذف تعيين المعلم
+            </h2>
+            <a href="{% url 'subjects:teacher_subject_list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-right me-2"></i>العودة للقائمة
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-exclamation-triangle me-2"></i>تأكيد الحذف
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <h6>هل أنت متأكد من حذف هذا التعيين؟</h6>
+                    <p class="mb-0">هذا الإجراء لا يمكن التراجع عنه.</p>
+                </div>
+                
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h6>تفاصيل التعيين:</h6>
+                        <p><strong>المعلم:</strong> {{ assignment.teacher.user.get_full_name }}</p>
+                        <p><strong>المادة:</strong> {{ assignment.subject.name }}</p>
+                        <p><strong>نوع التعيين:</strong> 
+                            {% if assignment.is_primary %}
+                                معلم رئيسي
+                            {% else %}
+                                معلم مساعد
+                            {% endif %}
+                        </p>
+                        <p><strong>تاريخ التعيين:</strong> {{ assignment.assigned_date|date:"Y-m-d" }}</p>
+                    </div>
+                </div>
+                
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'subjects:teacher_subject_list' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-right me-2"></i>إلغاء
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash me-2"></i>حذف التعيين
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

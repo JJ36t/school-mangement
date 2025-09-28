@@ -1,0 +1,81 @@
+{% extends 'base/base.html' %}
+
+{% block title %}حذف الطالب - {{ student.user.get_full_name }} - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-trash me-2"></i>
+                حذف الطالب
+            </h2>
+            <a href="{% url 'students:student_detail' student.id %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-right me-2"></i>العودة للتفاصيل
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-exclamation-triangle me-2"></i>تأكيد الحذف
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <i class="bi bi-person-x display-1 text-danger"></i>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <h6 class="alert-heading">
+                        <i class="bi bi-exclamation-triangle me-2"></i>تحذير!
+                    </h6>
+                    <p class="mb-0">هل أنت متأكد من أنك تريد حذف هذا الطالب؟ هذا الإجراء لا يمكن التراجع عنه.</p>
+                </div>
+                
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h6 class="card-title">معلومات الطالب المراد حذفه:</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>الاسم:</strong>
+                                <p class="mb-1">{{ student.user.get_full_name }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <strong>رقم الطالب:</strong>
+                                <p class="mb-1">{{ student.student_id }}</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>الصف:</strong>
+                                <p class="mb-1">{{ student.get_grade_display }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <strong>الفصل:</strong>
+                                <p class="mb-1">{{ student.section }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'students:student_detail' student.id %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-right me-2"></i>إلغاء
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash me-2"></i>تأكيد الحذف
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,209 @@
+{% extends 'base/base.html' %}
+
+{% block title %}تفاصيل المعلم - {{ teacher.user.get_full_name }} - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-person-workspace me-2"></i>
+                تفاصيل المعلم
+            </h2>
+            <div>
+                <a href="{% url 'teachers:edit_teacher' teacher.id %}" class="btn btn-warning me-2">
+                    <i class="bi bi-pencil me-2"></i>تعديل
+                </a>
+                <a href="{% url 'teachers:teacher_list' %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-right me-2"></i>العودة للقائمة
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                {% if teacher.user.profile_picture %}
+                    <img src="{{ teacher.user.profile_picture.url }}" alt="صورة المعلم" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                {% else %}
+                    <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center mb-3 mx-auto" style="width: 150px; height: 150px;">
+                        <i class="bi bi-person-fill text-white" style="font-size: 4rem;"></i>
+                    </div>
+                {% endif %}
+                <h4>{{ teacher.user.get_full_name }}</h4>
+                <p class="text-muted">{{ teacher.user.email }}</p>
+                <span class="badge bg-primary fs-6">{{ teacher.teacher_id }}</span>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-info-circle me-2"></i>معلومات الحساب
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>اسم المستخدم:</strong>
+                    <p class="mb-0">{{ teacher.user.username }}</p>
+                </div>
+                <div class="mb-3">
+                    <strong>تاريخ الانضمام:</strong>
+                    <p class="mb-0">{{ teacher.user.date_joined|date:"Y-m-d" }}</p>
+                </div>
+                <div class="mb-3">
+                    <strong>آخر تسجيل دخول:</strong>
+                    <p class="mb-0">{{ teacher.user.last_login|date:"Y-m-d H:i"|default:"لم يسجل دخول من قبل" }}</p>
+                </div>
+                <div class="mb-3">
+                    <strong>حالة الحساب:</strong>
+                    {% if teacher.user.is_active %}
+                        <span class="badge bg-success">نشط</span>
+                    {% else %}
+                        <span class="badge bg-danger">غير نشط</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-person-workspace me-2"></i>معلومات المعلم
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>رقم المعلم:</strong>
+                            <p class="mb-0">{{ teacher.teacher_id }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>الجنس:</strong>
+                            <p class="mb-0">
+                                <span class="badge bg-{% if teacher.gender == 'male' %}info{% else %}warning{% endif %}">
+                                    {{ teacher.get_gender_display }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>المؤهل العلمي:</strong>
+                            <p class="mb-0">
+                                <span class="badge bg-info">{{ teacher.get_qualification_display }}</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>التخصص:</strong>
+                            <p class="mb-0">{{ teacher.specialization }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>سنوات الخبرة:</strong>
+                            <p class="mb-0">{{ teacher.experience_years }} سنة</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>تاريخ التعيين:</strong>
+                            <p class="mb-0">{{ teacher.hire_date|date:"Y-m-d" }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>الراتب:</strong>
+                            <p class="mb-0">{{ teacher.salary|default:"غير محدد" }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>الحالة:</strong>
+                            <p class="mb-0">
+                                {% if teacher.is_active %}
+                                    <span class="badge bg-success">نشط</span>
+                                {% else %}
+                                    <span class="badge bg-danger">غير نشط</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-person me-2"></i>المعلومات الشخصية
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>رقم الهاتف:</strong>
+                            <p class="mb-0">{{ teacher.user.phone|default:"غير محدد" }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>تاريخ الميلاد:</strong>
+                            <p class="mb-0">{{ teacher.user.date_of_birth|default:"غير محدد" }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>العنوان:</strong>
+                    <p class="mb-0">{{ teacher.user.address|default:"غير محدد" }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-book me-2"></i>المواد المخصصة
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <p class="mb-0">قائمة المواد المخصصة لهذا المعلم</p>
+                    <a href="{% url 'teachers:assign_subject' teacher.id %}" class="btn btn-sm btn-primary">
+                        <i class="bi bi-plus-circle me-1"></i>إضافة مادة
+                    </a>
+                </div>
+                
+                <div class="text-center py-3">
+                    <i class="bi bi-book display-4 text-muted"></i>
+                    <p class="text-muted mt-2">لا توجد مواد مخصصة</p>
+                    <a href="{% url 'teachers:assign_subject' teacher.id %}" class="btn btn-outline-primary">
+                        <i class="bi bi-plus-circle me-2"></i>إضافة أول مادة
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

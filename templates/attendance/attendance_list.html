@@ -1,0 +1,220 @@
+{% extends 'base/base.html' %}
+
+{% block title %}قائمة الحضور والغياب - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-calendar-check me-2"></i>
+                قائمة الحضور والغياب
+            </h2>
+            <a href="{% url 'attendance:create_attendance' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>تسجيل حضور جديد
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h5 class="mb-0">
+                            <i class="bi bi-list-ul me-2"></i>جميع سجلات الحضور
+                        </h5>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="البحث عن حضور..." id="searchInput">
+                            <button class="btn btn-outline-secondary" type="button">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if page_obj %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>الطالب</th>
+                                    <th>المادة</th>
+                                    <th>المعلم</th>
+                                    <th>التاريخ</th>
+                                    <th>الحالة</th>
+                                    <th>وقت الحضور</th>
+                                    <th>وقت الانصراف</th>
+                                    <th>ملاحظات</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for attendance in page_obj %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if attendance.student.user.profile_picture %}
+                                                <img src="{{ attendance.student.user.profile_picture.url }}" alt="صورة الطالب" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                            {% else %}
+                                                <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                                                    <i class="bi bi-person-fill text-white"></i>
+                                                </div>
+                                            {% endif %}
+                                            <div>
+                                                <h6 class="mb-0">{{ attendance.student.user.get_full_name }}</h6>
+                                                <small class="text-muted">{{ attendance.student.student_id }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <h6 class="mb-0">{{ attendance.subject.name }}</h6>
+                                            <small class="text-muted">{{ attendance.subject.code }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if attendance.teacher.user.profile_picture %}
+                                                <img src="{{ attendance.teacher.user.profile_picture.url }}" alt="صورة المعلم" class="rounded-circle me-2" style="width: 30px; height: 30px; object-fit: cover;">
+                                            {% else %}
+                                                <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px;">
+                                                    <i class="bi bi-person-fill text-white" style="font-size: 0.8rem;"></i>
+                                                </div>
+                                            {% endif %}
+                                            <div>
+                                                <h6 class="mb-0">{{ attendance.teacher.user.get_full_name }}</h6>
+                                                <small class="text-muted">{{ attendance.teacher.specialization }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ attendance.date|date:"Y-m-d" }}</td>
+                                    <td>
+                                        {% if attendance.status == 'present' %}
+                                            <span class="badge bg-success fs-6">
+                                                <i class="bi bi-check-circle me-1"></i>حاضر
+                                            </span>
+                                        {% elif attendance.status == 'absent' %}
+                                            <span class="badge bg-danger fs-6">
+                                                <i class="bi bi-x-circle me-1"></i>غائب
+                                            </span>
+                                        {% elif attendance.status == 'late' %}
+                                            <span class="badge bg-warning fs-6">
+                                                <i class="bi bi-clock me-1"></i>متأخر
+                                            </span>
+                                        {% elif attendance.status == 'excused' %}
+                                            <span class="badge bg-info fs-6">
+                                                <i class="bi bi-info-circle me-1"></i>معذور
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if attendance.check_in_time %}
+                                            <span class="text-success">{{ attendance.check_in_time|time:"H:i" }}</span>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if attendance.check_out_time %}
+                                            <span class="text-info">{{ attendance.check_out_time|time:"H:i" }}</span>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="text-truncate d-inline-block" style="max-width: 150px;" title="{{ attendance.notes }}">
+                                            {{ attendance.notes|truncatechars:30|default:"-" }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'attendance:attendance_detail' attendance.id %}" class="btn btn-sm btn-outline-info" title="عرض التفاصيل">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="{% url 'attendance:edit_attendance' attendance.id %}" class="btn btn-sm btn-outline-warning" title="تعديل">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a href="{% url 'attendance:delete_attendance' attendance.id %}" class="btn btn-sm btn-outline-danger" title="حذف">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    {% if page_obj.has_other_pages %}
+                        <nav aria-label="صفحات الحضور">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1">الأولى</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">السابقة</a>
+                                    </li>
+                                {% endif %}
+                                
+                                <li class="page-item active">
+                                    <span class="page-link">
+                                        صفحة {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}
+                                    </span>
+                                </li>
+                                
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">التالية</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">الأخيرة</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-calendar-check display-1 text-muted"></i>
+                        <h4 class="text-muted mt-3">لا توجد سجلات حضور</h4>
+                        <p class="text-muted">لم يتم تسجيل أي حضور بعد.</p>
+                        <a href="{% url 'attendance:create_attendance' %}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-2"></i>تسجيل أول حضور
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const tableRows = document.querySelectorAll('tbody tr');
+        
+        tableRows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            if (text.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

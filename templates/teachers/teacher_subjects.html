@@ -1,0 +1,105 @@
+{% extends 'base/base.html' %}
+
+{% block title %}مواد المعلم - {{ teacher.user.get_full_name }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-1">
+                    <i class="bi bi-book text-primary me-2"></i>
+                    مواد المعلم
+                </h2>
+                <p class="text-muted mb-0">{{ teacher.user.get_full_name }}</p>
+            </div>
+            <div>
+                <a href="{% url 'teachers:assign_subject' teacher.id %}" class="btn btn-success me-2">
+                    <i class="bi bi-plus-circle me-2"></i>تعيين مادة
+                </a>
+                <a href="{% url 'teachers:teacher_detail' teacher.id %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-right me-2"></i>العودة للتفاصيل
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-list-ul me-2"></i>المواد المعينة
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if teacher_subjects %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>اسم المادة</th>
+                                    <th>رمز المادة</th>
+                                    <th>المرحلة</th>
+                                    <th>الصف</th>
+                                    <th>نوع المادة</th>
+                                    <th>عدد الساعات</th>
+                                    <th>نوع التعيين</th>
+                                    <th>تاريخ التعيين</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for teacher_subject in teacher_subjects %}
+                                <tr>
+                                    <td>{{ teacher_subject.subject.name }}</td>
+                                    <td>{{ teacher_subject.subject.code }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if teacher_subject.subject.level == 'elementary' %}success{% elif teacher_subject.subject.level == 'middle' %}warning{% else %}info{% endif %}">
+                                            {{ teacher_subject.subject.get_level_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ teacher_subject.subject.get_grade_display }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if teacher_subject.subject.subject_type == 'core' %}primary{% elif teacher_subject.subject.subject_type == 'elective' %}success{% else %}info{% endif %}">
+                                            {{ teacher_subject.subject.get_subject_type_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ teacher_subject.subject.credit_hours }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if teacher_subject.is_primary %}primary{% else %}secondary{% endif %}">
+                                            {% if teacher_subject.is_primary %}معلم أساسي{% else %}معلم مساعد{% endif %}
+                                        </span>
+                                    </td>
+                                    <td>{{ teacher_subject.assigned_date|date:"Y-m-d" }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'subjects:subject_detail' teacher_subject.subject.id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="{% url 'teachers:remove_subject' teacher.id teacher_subject.subject.id %}" class="btn btn-sm btn-outline-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-book display-1 text-muted"></i>
+                        <h4 class="text-muted mt-3">لا توجد مواد معينة</h4>
+                        <p class="text-muted">لم يتم تعيين أي مواد لهذا المعلم بعد</p>
+                        <a href="{% url 'teachers:assign_subject' teacher.id %}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-2"></i>تعيين مادة
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,235 @@
+{% extends 'base/base.html' %}
+
+{% block title %}حضور الطالب - {{ student.user.get_full_name }} - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-person-badge me-2"></i>
+                حضور الطالب
+            </h2>
+            <a href="{% url 'attendance:attendance_list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-right me-2"></i>العودة للقائمة
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                {% if student.user.profile_picture %}
+                    <img src="{{ student.user.profile_picture.url }}" alt="صورة الطالب" class="img-fluid rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;">
+                {% else %}
+                    <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center mb-3 mx-auto" style="width: 120px; height: 120px;">
+                        <i class="bi bi-person-fill text-white" style="font-size: 3rem;"></i>
+                    </div>
+                {% endif %}
+                <h4>{{ student.user.get_full_name }}</h4>
+                <p class="text-muted">{{ student.student_id }}</p>
+                <span class="badge bg-primary fs-6">{{ student.get_grade_display }} - {{ student.section }}</span>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-graph-up me-2"></i>إحصائيات الحضور
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="border-end">
+                            <h4 class="text-success mb-1">{{ present_count }}</h4>
+                            <small class="text-muted">حاضر</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <h4 class="text-danger mb-1">{{ absent_count }}</h4>
+                        <small class="text-muted">غائب</small>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="border-end">
+                            <h4 class="text-warning mb-1">{{ late_count }}</h4>
+                            <small class="text-muted">متأخر</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <h4 class="text-info mb-1">{{ excused_count }}</h4>
+                        <small class="text-muted">معذور</small>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="text-center">
+                    <h4 class="text-primary mb-1">{{ attendance_percentage|floatformat:1 }}%</h4>
+                    <small class="text-muted">نسبة الحضور</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-calendar me-2"></i>فترة التقرير
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>من:</strong>
+                    <p class="mb-0">{{ start_date|date:"Y-m-d" }}</p>
+                </div>
+                <div class="mb-3">
+                    <strong>إلى:</strong>
+                    <p class="mb-0">{{ end_date|date:"Y-m-d" }}</p>
+                </div>
+                <div class="mb-3">
+                    <strong>إجمالي الأيام:</strong>
+                    <p class="mb-0">{{ total_days }} يوم</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-calendar-check me-2"></i>سجل الحضور
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if attendance_records %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>التاريخ</th>
+                                    <th>المادة</th>
+                                    <th>المعلم</th>
+                                    <th>الحالة</th>
+                                    <th>وقت الحضور</th>
+                                    <th>وقت الانصراف</th>
+                                    <th>ملاحظات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in attendance_records %}
+                                <tr>
+                                    <td>{{ record.date|date:"Y-m-d" }}</td>
+                                    <td>
+                                        <div>
+                                            <h6 class="mb-0">{{ record.subject.name }}</h6>
+                                            <small class="text-muted">{{ record.subject.code }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if record.teacher.user.profile_picture %}
+                                                <img src="{{ record.teacher.user.profile_picture.url }}" alt="صورة المعلم" class="rounded-circle me-2" style="width: 30px; height: 30px; object-fit: cover;">
+                                            {% else %}
+                                                <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px;">
+                                                    <i class="bi bi-person-fill text-white" style="font-size: 0.8rem;"></i>
+                                                </div>
+                                            {% endif %}
+                                            <div>
+                                                <h6 class="mb-0">{{ record.teacher.user.get_full_name }}</h6>
+                                                <small class="text-muted">{{ record.teacher.specialization }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if record.status == 'present' %}
+                                            <span class="badge bg-success fs-6">
+                                                <i class="bi bi-check-circle me-1"></i>حاضر
+                                            </span>
+                                        {% elif record.status == 'absent' %}
+                                            <span class="badge bg-danger fs-6">
+                                                <i class="bi bi-x-circle me-1"></i>غائب
+                                            </span>
+                                        {% elif record.status == 'late' %}
+                                            <span class="badge bg-warning fs-6">
+                                                <i class="bi bi-clock me-1"></i>متأخر
+                                            </span>
+                                        {% elif record.status == 'excused' %}
+                                            <span class="badge bg-info fs-6">
+                                                <i class="bi bi-info-circle me-1"></i>معذور
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if record.check_in_time %}
+                                            <span class="text-success">{{ record.check_in_time|time:"H:i" }}</span>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if record.check_out_time %}
+                                            <span class="text-info">{{ record.check_out_time|time:"H:i" }}</span>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="text-truncate d-inline-block" style="max-width: 150px;" title="{{ record.notes }}">
+                                            {{ record.notes|truncatechars:30|default:"-" }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-calendar-check display-1 text-muted"></i>
+                        <h4 class="text-muted mt-3">لا توجد سجلات حضور</h4>
+                        <p class="text-muted">لم يتم تسجيل أي حضور لهذا الطالب في الفترة المحددة.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if attendance_records %}
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-bar-chart me-2"></i>تحليل الحضور حسب المادة
+                </h5>
+            </div>
+            <div class="card-body">
+                {% for subject_stats in subject_statistics %}
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <h6 class="mb-0">{{ subject_stats.subject.name }}</h6>
+                        <span class="badge bg-primary">{{ subject_stats.attendance_percentage|floatformat:1 }}%</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar bg-{% if subject_stats.attendance_percentage >= 90 %}success{% elif subject_stats.attendance_percentage >= 80 %}info{% elif subject_stats.attendance_percentage >= 70 %}warning{% else %}danger{% endif %}" 
+                             role="progressbar" 
+                             style="width: {{ subject_stats.attendance_percentage }}%"
+                             aria-valuenow="{{ subject_stats.attendance_percentage }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                        </div>
+                    </div>
+                    <small class="text-muted">{{ subject_stats.present_count }} حاضر من {{ subject_stats.total_count }} جلسة</small>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

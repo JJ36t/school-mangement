@@ -1,0 +1,140 @@
+{% extends 'base/base.html' %}
+
+{% block title %}الملف الشخصي - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-person-circle me-2"></i>الملف الشخصي
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 text-center">
+                        {% if user.profile_picture %}
+                            <img src="{{ user.profile_picture.url }}" alt="صورة الملف الشخصي" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                        {% else %}
+                            <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center mb-3 mx-auto" style="width: 150px; height: 150px;">
+                                <i class="bi bi-person-fill text-white" style="font-size: 4rem;"></i>
+                            </div>
+                        {% endif %}
+                        <h4>{{ user.get_full_name|default:user.username }}</h4>
+                        <span class="badge bg-primary">{{ user.get_role_display }}</span>
+                    </div>
+                    <div class="col-md-8">
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>اسم المستخدم:</strong></td>
+                                <td>{{ user.username }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>البريد الإلكتروني:</strong></td>
+                                <td>{{ user.email|default:"غير محدد" }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>رقم الهاتف:</strong></td>
+                                <td>{{ user.phone|default:"غير محدد" }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>العنوان:</strong></td>
+                                <td>{{ user.address|default:"غير محدد" }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>تاريخ الميلاد:</strong></td>
+                                <td>{{ user.date_of_birth|default:"غير محدد" }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>تاريخ الانضمام:</strong></td>
+                                <td>{{ user.date_joined|date:"Y-m-d" }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>آخر تسجيل دخول:</strong></td>
+                                <td>{{ user.last_login|date:"Y-m-d H:i"|default:"لم يسجل دخول من قبل" }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'accounts:edit_profile' %}" class="btn btn-primary">
+                    <i class="bi bi-pencil-square me-2"></i>تعديل الملف الشخصي
+                </a>
+                <a href="{% url 'accounts:change_password' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-key me-2"></i>تغيير كلمة المرور
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-info-circle me-2"></i>معلومات الحساب
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>حالة الحساب:</strong>
+                    {% if user.is_active %}
+                        <span class="badge bg-success">نشط</span>
+                    {% else %}
+                        <span class="badge bg-danger">غير نشط</span>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <strong>صلاحيات المدير:</strong>
+                    {% if user.is_staff %}
+                        <span class="badge bg-warning">مدير</span>
+                    {% else %}
+                        <span class="badge bg-secondary">مستخدم عادي</span>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <strong>صلاحيات النظام:</strong>
+                    {% if user.is_superuser %}
+                        <span class="badge bg-danger">مدير عام</span>
+                    {% else %}
+                        <span class="badge bg-secondary">مستخدم عادي</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        {% if user.role == 'student' and user.student %}
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-mortarboard me-2"></i>معلومات الطالب
+                </h6>
+            </div>
+            <div class="card-body">
+                <p><strong>رقم الطالب:</strong> {{ user.student.student_id }}</p>
+                <p><strong>الصف:</strong> {{ user.student.get_grade_display }}</p>
+                <p><strong>الفصل:</strong> {{ user.student.section }}</p>
+                <p><strong>تاريخ التسجيل:</strong> {{ user.student.enrollment_date }}</p>
+            </div>
+        </div>
+        {% elif user.role == 'teacher' and user.teacher %}
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-person-workspace me-2"></i>معلومات المعلم
+                </h6>
+            </div>
+            <div class="card-body">
+                <p><strong>رقم المعلم:</strong> {{ user.teacher.teacher_id }}</p>
+                <p><strong>التخصص:</strong> {{ user.teacher.specialization }}</p>
+                <p><strong>المؤهل:</strong> {{ user.teacher.get_qualification_display }}</p>
+                <p><strong>سنوات الخبرة:</strong> {{ user.teacher.experience_years }}</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

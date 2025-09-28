@@ -1,0 +1,290 @@
+{% extends 'base/base.html' %}
+
+{% block title %}تعيين معلم للمادة - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<!-- Header Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-1">
+                    <i class="bi bi-person-plus text-primary me-2"></i>
+                    تعيين معلم للمادة
+                </h2>
+                <p class="text-muted mb-0">تعيين معلم للمادة: <strong>{{ subject.name }}</strong></p>
+            </div>
+            <a href="{% url 'subjects:subject_detail' subject.id %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-right me-2"></i>العودة للمادة
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-person-workspace me-2"></i>تعيين معلم للمادة
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <!-- Subject Info -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-book me-3 fs-4"></i>
+                                <div>
+                                    <h6 class="mb-1">معلومات المادة</h6>
+                                    <p class="mb-0">
+                                        <strong>اسم المادة:</strong> {{ subject.name }}<br>
+                                        <strong>كود المادة:</strong> {{ subject.code }}<br>
+                                        <strong>الصف:</strong> {{ subject.get_grade_display }}<br>
+                                        <strong>نوع المادة:</strong> {{ subject.get_subject_type_display }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <form method="post" id="assignTeacherForm">
+                    {% csrf_token %}
+                    
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <div class="form-floating">
+                                {{ form.teacher }}
+                                <label for="{{ form.teacher.id_for_label }}">اختر المعلم *</label>
+                                {% if form.teacher.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.teacher.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check form-switch mt-4">
+                                {{ form.is_primary }}
+                                <label class="form-check-label" for="{{ form.is_primary.id_for_label }}">
+                                    معلم رئيسي
+                                </label>
+                                {% if form.is_primary.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.is_primary.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Hidden subject field -->
+                    {{ form.subject.as_hidden }}
+                    
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-between mt-5 pt-4 border-top">
+                        <a href="{% url 'subjects:subject_detail' subject.id %}" class="btn btn-outline-secondary btn-lg">
+                            <i class="bi bi-arrow-right me-2"></i>إلغاء
+                        </a>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-check-lg me-2"></i>تعيين المعلم
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Current Teachers Section -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="bi bi-people me-2"></i>المعلمون المخصصون حالياً
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if subject.teachersubject_set.all %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>المعلم</th>
+                                    <th>التخصص</th>
+                                    <th>نوع التعيين</th>
+                                    <th>تاريخ التعيين</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for assignment in subject.teachersubject_set.all %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                                <i class="bi bi-person-fill text-white"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">{{ assignment.teacher.user.get_full_name }}</h6>
+                                                <small class="text-muted">{{ assignment.teacher.teacher_id }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ assignment.teacher.specialization }}</span>
+                                    </td>
+                                    <td>
+                                        {% if assignment.is_primary %}
+                                            <span class="badge bg-success">معلم رئيسي</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">معلم مساعد</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ assignment.assigned_date|date:"Y-m-d" }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'subjects:edit_teacher_subject' assignment.id %}" class="btn btn-sm btn-outline-warning" title="تعديل">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a href="{% url 'subjects:delete_teacher_subject' assignment.id %}" class="btn btn-sm btn-outline-danger" title="إلغاء التعيين">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-person-x display-4 text-muted"></i>
+                        <h5 class="text-muted mt-3">لا يوجد معلمون مخصصون</h5>
+                        <p class="text-muted">لم يتم تعيين أي معلمين لهذه المادة بعد.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const form = document.getElementById('assignTeacherForm');
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        // Check required fields
+        const teacherField = document.getElementById('{{ form.teacher.id_for_label }}');
+        if (!teacherField.value) {
+            teacherField.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            teacherField.classList.remove('is-invalid');
+            teacherField.classList.add('is-valid');
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+            // Show error message
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'alert alert-danger mt-3';
+            errorDiv.innerHTML = '<i class="bi bi-exclamation-triangle me-2"></i>يرجى اختيار معلم للمادة.';
+            form.appendChild(errorDiv);
+            
+            // Remove error message after 5 seconds
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 5000);
+        }
+    });
+    
+    // Real-time validation
+    const teacherField = document.getElementById('{{ form.teacher.id_for_label }}');
+    teacherField.addEventListener('change', function() {
+        if (this.value) {
+            this.classList.remove('is-invalid');
+            this.classList.add('is-valid');
+        } else {
+            this.classList.remove('is-valid');
+        }
+    });
+});
+</script>
+
+<style>
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label,
+.form-floating > .form-select ~ label {
+    opacity: 0.65;
+    transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+}
+
+.form-floating > .form-control,
+.form-floating > .form-select {
+    height: calc(3.5rem + 2px);
+    line-height: 1.25;
+}
+
+.form-floating > label {
+    padding: 1rem 0.75rem;
+}
+
+.card {
+    border: none;
+    border-radius: 1rem;
+}
+
+.card-header {
+    border-radius: 1rem 1rem 0 0 !important;
+    border: none;
+}
+
+.btn-lg {
+    padding: 0.75rem 2rem;
+    font-size: 1.1rem;
+    border-radius: 0.5rem;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.is-valid {
+    border-color: #198754;
+}
+
+.is-invalid {
+    border-color: #dc3545;
+}
+
+.bg-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.alert-info {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    border: none;
+    color: white;
+}
+
+.alert-info h6, .alert-info p {
+    color: white;
+}
+
+.form-check-input:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.form-check-input:focus {
+    border-color: #86b7fe;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+</style>
+{% endblock %}

@@ -1,0 +1,168 @@
+{% extends 'base/base.html' %}
+
+{% block title %}تفاصيل المستخدم - {{ user_obj.get_full_name }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-1">
+                    <i class="bi bi-person text-primary me-2"></i>
+                    تفاصيل المستخدم
+                </h2>
+                <p class="text-muted mb-0">{{ user_obj.get_full_name }}</p>
+            </div>
+            <div>
+                <a href="{% url 'accounts:edit_user' user_obj.id %}" class="btn btn-warning me-2">
+                    <i class="bi bi-pencil me-2"></i>تعديل
+                </a>
+                <a href="{% url 'accounts:user_list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-right me-2"></i>العودة للقائمة
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-person-circle me-2"></i>الملف الشخصي
+                </h5>
+            </div>
+            <div class="card-body text-center">
+                {% if user_obj.profile_picture %}
+                    <img src="{{ user_obj.profile_picture.url }}" class="rounded-circle mb-3" width="120" height="120" alt="صورة الملف الشخصي">
+                {% else %}
+                    <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 120px; height: 120px;">
+                        <i class="bi bi-person text-white" style="font-size: 3rem;"></i>
+                    </div>
+                {% endif %}
+                <h4 class="mb-1">{{ user_obj.get_full_name }}</h4>
+                <p class="text-muted mb-2">{{ user_obj.username }}</p>
+                <span class="badge bg-{% if user_obj.role == 'admin' %}danger{% elif user_obj.role == 'teacher' %}success{% elif user_obj.role == 'student' %}info{% else %}secondary{% endif %} fs-6">
+                    {{ user_obj.get_role_display }}
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-info-circle me-2"></i>معلومات المستخدم
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>اسم المستخدم:</strong></td>
+                                <td>{{ user_obj.username }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>البريد الإلكتروني:</strong></td>
+                                <td>{{ user_obj.email }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>الاسم الأول:</strong></td>
+                                <td>{{ user_obj.first_name }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>الاسم الأخير:</strong></td>
+                                <td>{{ user_obj.last_name }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>نوع الحساب:</strong></td>
+                                <td>
+                                    <span class="badge bg-{% if user_obj.role == 'admin' %}danger{% elif user_obj.role == 'teacher' %}success{% elif user_obj.role == 'student' %}info{% else %}secondary{% endif %}">
+                                        {{ user_obj.get_role_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>رقم الهاتف:</strong></td>
+                                <td>{{ user_obj.phone|default:"غير محدد" }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>تاريخ الميلاد:</strong></td>
+                                <td>{{ user_obj.date_of_birth|date:"Y-m-d"|default:"غير محدد" }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>الحالة:</strong></td>
+                                <td>
+                                    <span class="badge bg-{% if user_obj.is_active %}success{% else %}danger{% endif %}">
+                                        {% if user_obj.is_active %}نشط{% else %}غير نشط{% endif %}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>تاريخ الإنشاء:</strong></td>
+                                <td>{{ user_obj.created_at|date:"Y-m-d H:i" }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>آخر تحديث:</strong></td>
+                                <td>{{ user_obj.updated_at|date:"Y-m-d H:i" }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                {% if user_obj.address %}
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6 class="text-muted">العنوان:</h6>
+                        <p class="border p-3 rounded bg-light">{{ user_obj.address }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-gear me-2"></i>إجراءات المستخدم
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'accounts:edit_user' user_obj.id %}" class="btn btn-warning w-100">
+                            <i class="bi bi-pencil me-2"></i>تعديل المستخدم
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'accounts:change_password' %}" class="btn btn-info w-100">
+                            <i class="bi bi-key me-2"></i>تغيير كلمة المرور
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'accounts:delete_user' user_obj.id %}" class="btn btn-danger w-100">
+                            <i class="bi bi-trash me-2"></i>حذف المستخدم
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'accounts:user_list' %}" class="btn btn-secondary w-100">
+                            <i class="bi bi-arrow-right me-2"></i>العودة للقائمة
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

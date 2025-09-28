@@ -1,0 +1,259 @@
+{% extends 'base/base.html' %}
+
+{% block title %}ملخص الدرجات - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-bar-chart me-2"></i>
+                ملخص الدرجات
+            </h2>
+            <div>
+                <a href="{% url 'grades:export_grades' %}" class="btn btn-success me-2">
+                    <i class="bi bi-download me-2"></i>تصدير
+                </a>
+                <a href="{% url 'grades:grade_list' %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-right me-2"></i>العودة للقائمة
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="stats-card text-center">
+            <i class="bi bi-award stats-icon"></i>
+            <div class="stats-number">{{ total_grades }}</div>
+            <div class="stats-label">إجمالي الدرجات</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card text-center">
+            <i class="bi bi-people stats-icon"></i>
+            <div class="stats-number">{{ total_students }}</div>
+            <div class="stats-label">عدد الطلاب</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card text-center">
+            <i class="bi bi-book stats-icon"></i>
+            <div class="stats-number">{{ total_subjects }}</div>
+            <div class="stats-label">عدد المواد</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card text-center">
+            <i class="bi bi-graph-up stats-icon"></i>
+            <div class="stats-number">{{ average_percentage|floatformat:1 }}%</div>
+            <div class="stats-label">المتوسط العام</div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-pie-chart me-2"></i>توزيع التقديرات
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>ممتاز (A+, A)</span>
+                        <div>
+                            <span class="badge bg-success me-2">{{ excellent_count }}</span>
+                            <span class="text-muted">{{ excellent_percentage|floatformat:1 }}%</span>
+                        </div>
+                    </div>
+                    <div class="progress mt-1" style="height: 8px;">
+                        <div class="progress-bar bg-success" style="width: {{ excellent_percentage }}%"></div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>جيد جداً (B+, B)</span>
+                        <div>
+                            <span class="badge bg-info me-2">{{ very_good_count }}</span>
+                            <span class="text-muted">{{ very_good_percentage|floatformat:1 }}%</span>
+                        </div>
+                    </div>
+                    <div class="progress mt-1" style="height: 8px;">
+                        <div class="progress-bar bg-info" style="width: {{ very_good_percentage }}%"></div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>جيد (C+, C)</span>
+                        <div>
+                            <span class="badge bg-warning me-2">{{ good_count }}</span>
+                            <span class="text-muted">{{ good_percentage|floatformat:1 }}%</span>
+                        </div>
+                    </div>
+                    <div class="progress mt-1" style="height: 8px;">
+                        <div class="progress-bar bg-warning" style="width: {{ good_percentage }}%"></div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>مقبول (D+, D)</span>
+                        <div>
+                            <span class="badge bg-secondary me-2">{{ acceptable_count }}</span>
+                            <span class="text-muted">{{ acceptable_percentage|floatformat:1 }}%</span>
+                        </div>
+                    </div>
+                    <div class="progress mt-1" style="height: 8px;">
+                        <div class="progress-bar bg-secondary" style="width: {{ acceptable_percentage }}%"></div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>ضعيف (F)</span>
+                        <div>
+                            <span class="badge bg-danger me-2">{{ weak_count }}</span>
+                            <span class="text-muted">{{ weak_percentage|floatformat:1 }}%</span>
+                        </div>
+                    </div>
+                    <div class="progress mt-1" style="height: 8px;">
+                        <div class="progress-bar bg-danger" style="width: {{ weak_percentage }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-bar-chart me-2"></i>أفضل الطلاب
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if top_students %}
+                    <div class="list-group list-group-flush">
+                        {% for student in top_students %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    {% if student.student.user.profile_picture %}
+                                        <img src="{{ student.student.user.profile_picture.url }}" alt="صورة الطالب" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                    {% else %}
+                                        <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                                            <i class="bi bi-person-fill text-white"></i>
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <h6 class="mb-0">{{ student.student.user.get_full_name }}</h6>
+                                        <small class="text-muted">{{ student.student.student_id }}</small>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-success fs-6">{{ student.average|floatformat:1 }}%</span>
+                                    <br>
+                                    <small class="text-muted">{{ student.grade_count }} درجة</small>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center">لا توجد بيانات كافية</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-book me-2"></i>أداء المواد
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if subject_performance %}
+                    <div class="list-group list-group-flush">
+                        {% for subject in subject_performance %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0">{{ subject.subject.name }}</h6>
+                                    <small class="text-muted">{{ subject.subject.code }}</small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-{% if subject.average >= 90 %}success{% elif subject.average >= 80 %}info{% elif subject.average >= 70 %}warning{% else %}danger{% endif %} fs-6">
+                                        {{ subject.average|floatformat:1 }}%
+                                    </span>
+                                    <br>
+                                    <small class="text-muted">{{ subject.grade_count }} درجة</small>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center">لا توجد بيانات كافية</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-calendar me-2"></i>إحصائيات حسب نوع الامتحان
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>امتحانات منتصف الفصل</span>
+                        <div>
+                            <span class="badge bg-warning me-2">{{ midterm_count }}</span>
+                            <span class="text-muted">{{ midterm_average|floatformat:1 }}%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>امتحانات نهاية الفصل</span>
+                        <div>
+                            <span class="badge bg-danger me-2">{{ final_count }}</span>
+                            <span class="text-muted">{{ final_average|floatformat:1 }}%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>امتحانات عملية</span>
+                        <div>
+                            <span class="badge bg-info me-2">{{ practical_count }}</span>
+                            <span class="text-muted">{{ practical_average|floatformat:1 }}%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>امتحانات أخرى</span>
+                        <div>
+                            <span class="badge bg-secondary me-2">{{ other_count }}</span>
+                            <span class="text-muted">{{ other_average|floatformat:1 }}%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

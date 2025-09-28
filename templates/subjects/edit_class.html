@@ -1,0 +1,128 @@
+{% extends 'base/base.html' %}
+
+{% block title %}تعديل الفصل - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-pencil me-2"></i>
+                تعديل الفصل
+            </h2>
+            <a href="{% url 'subjects:class_detail' class_obj.id %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-right me-2"></i>العودة للتفاصيل
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-door-open me-2"></i>تعديل معلومات الفصل
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.name.id_for_label }}" class="form-label">اسم الفصل *</label>
+                                {{ form.name }}
+                                {% if form.name.errors %}
+                                    <div class="text-danger">{{ form.name.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.section.id_for_label }}" class="form-label">القسم *</label>
+                                {{ form.section }}
+                                {% if form.section.errors %}
+                                    <div class="text-danger">{{ form.section.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.level.id_for_label }}" class="form-label">المرحلة *</label>
+                                {{ form.level }}
+                                {% if form.level.errors %}
+                                    <div class="text-danger">{{ form.level.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.grade.id_for_label }}" class="form-label">الصف *</label>
+                                {{ form.grade }}
+                                {% if form.grade.errors %}
+                                    <div class="text-danger">{{ form.grade.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.capacity.id_for_label }}" class="form-label">السعة *</label>
+                                {{ form.capacity }}
+                                {% if form.capacity.errors %}
+                                    <div class="text-danger">{{ form.capacity.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.location.id_for_label }}" class="form-label">الموقع</label>
+                                {{ form.location }}
+                                {% if form.location.errors %}
+                                    <div class="text-danger">{{ form.location.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.class_teacher.id_for_label }}" class="form-label">معلم الفصل</label>
+                        {{ form.class_teacher }}
+                        {% if form.class_teacher.errors %}
+                            <div class="text-danger">{{ form.class_teacher.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            {{ form.is_active }}
+                            <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                الفصل نشط
+                            </label>
+                        </div>
+                        {% if form.is_active.errors %}
+                            <div class="text-danger">{{ form.is_active.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'subjects:class_detail' class_obj.id %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-right me-2"></i>إلغاء
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-2"></i>حفظ التعديلات
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

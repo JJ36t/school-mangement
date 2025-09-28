@@ -1,0 +1,78 @@
+{% extends 'base/base.html' %}
+
+{% block title %}تعيين معلم للمادة - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-person-plus me-2"></i>
+                تعيين معلم للمادة
+            </h2>
+            <a href="{% url 'subjects:teacher_subject_list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-right me-2"></i>العودة للقائمة
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-person-workspace me-2"></i>معلومات التعيين
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.teacher.id_for_label }}" class="form-label">المعلم *</label>
+                                {{ form.teacher }}
+                                {% if form.teacher.errors %}
+                                    <div class="text-danger">{{ form.teacher.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.subject.id_for_label }}" class="form-label">المادة *</label>
+                                {{ form.subject }}
+                                {% if form.subject.errors %}
+                                    <div class="text-danger">{{ form.subject.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            {{ form.is_primary }}
+                            <label class="form-check-label" for="{{ form.is_primary.id_for_label }}">
+                                معلم أساسي
+                            </label>
+                        </div>
+                        {% if form.is_primary.errors %}
+                            <div class="text-danger">{{ form.is_primary.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'subjects:teacher_subject_list' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-right me-2"></i>إلغاء
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-2"></i>حفظ التعيين
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

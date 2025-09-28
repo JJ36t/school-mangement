@@ -1,0 +1,519 @@
+{% extends 'base/base.html' %}
+
+{% block title %}التقارير والإحصائيات - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-file-earmark-bar-graph me-2"></i>
+                التقارير والإحصائيات
+            </h2>
+            <div>
+                <a href="{% url 'dashboard:export_report' %}" class="btn btn-success me-2">
+                    <i class="bi bi-download me-2"></i>تصدير تقرير
+                </a>
+                <a href="{% url 'dashboard:admin_dashboard' %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-right me-2"></i>العودة للوحة التحكم
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- فلاتر التقارير -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-funnel me-2"></i>فلاتر التقارير
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-3">
+                        <label for="report_type" class="form-label">نوع التقرير</label>
+                        <select class="form-select" id="report_type" name="report_type">
+                            <option value="">اختر نوع التقرير</option>
+                            <option value="students">تقرير الطلاب</option>
+                            <option value="teachers">تقرير المعلمين</option>
+                            <option value="grades">تقرير الدرجات</option>
+                            <option value="attendance">تقرير الحضور</option>
+                            <option value="payments">تقرير المدفوعات</option>
+                            <option value="financial">التقرير المالي</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="start_date" class="form-label">من تاريخ</label>
+                        <input type="date" class="form-control" id="start_date" name="start_date">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="end_date" class="form-label">إلى تاريخ</label>
+                        <input type="date" class="form-control" id="end_date" name="end_date">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="grade" class="form-label">الصف</label>
+                        <select class="form-select" id="grade" name="grade">
+                            <option value="">جميع الصفوف</option>
+                            <option value="1">الصف الأول</option>
+                            <option value="2">الصف الثاني</option>
+                            <option value="3">الصف الثالث</option>
+                            <option value="4">الصف الرابع</option>
+                            <option value="5">الصف الخامس</option>
+                            <option value="6">الصف السادس</option>
+                            <option value="7">الصف السابع</option>
+                            <option value="8">الصف الثامن</option>
+                            <option value="9">الصف التاسع</option>
+                            <option value="10">الصف العاشر</option>
+                            <option value="11">الصف الحادي عشر</option>
+                            <option value="12">الصف الثاني عشر</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search me-2"></i>توليد التقرير
+                        </button>
+                        <a href="{% url 'dashboard:reports' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-clockwise me-2"></i>إعادة تعيين
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- إحصائيات عامة -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-people text-primary display-4"></i>
+                <h4 class="text-primary mt-2">{{ total_students }}</h4>
+                <p class="text-muted">إجمالي الطلاب</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-person-badge text-success display-4"></i>
+                <h4 class="text-success mt-2">{{ total_teachers }}</h4>
+                <p class="text-muted">إجمالي المعلمين</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-book text-info display-4"></i>
+                <h4 class="text-info mt-2">{{ total_subjects }}</h4>
+                <p class="text-muted">إجمالي المواد</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-currency-exchange text-warning display-4"></i>
+                <h4 class="text-warning mt-2">{{ total_payments }} دينار</h4>
+                <p class="text-muted">إجمالي المدفوعات</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- تقرير الطلاب -->
+{% if report_type == 'students' or not report_type %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-people me-2"></i>تقرير الطلاب
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>رقم الطالب</th>
+                                <th>الاسم</th>
+                                <th>الصف</th>
+                                <th>معدل الحضور</th>
+                                <th>المتوسط العام</th>
+                                <th>المدفوعات</th>
+                                <th>الحالة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in students_report %}
+                            <tr>
+                                <td>{{ student.student_id }}</td>
+                                <td>{{ student.user.get_full_name }}</td>
+                                <td>{{ student.get_grade_display }} - {{ student.section }}</td>
+                                <td>
+                                    <span class="badge bg-{% if student.attendance_rate >= 80 %}success{% elif student.attendance_rate >= 60 %}warning{% else %}danger{% endif %}">
+                                        {{ student.attendance_rate|floatformat:1 }}%
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{% if student.average_grade >= 80 %}success{% elif student.average_grade >= 60 %}info{% elif student.average_grade >= 40 %}warning{% else %}danger{% endif %}">
+                                        {{ student.average_grade|floatformat:1 }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{% if student.payment_status == 'paid' %}success{% elif student.payment_status == 'pending' %}warning{% else %}danger{% endif %}">
+                                        {{ student.payment_status_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{% if student.overall_status == 'excellent' %}success{% elif student.overall_status == 'good' %}info{% elif student.overall_status == 'average' %}warning{% else %}danger{% endif %}">
+                                        {{ student.overall_status_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- تقرير الدرجات -->
+{% if report_type == 'grades' or not report_type %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-award me-2"></i>تقرير الدرجات
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <canvas id="gradesDistributionChart" width="400" height="200"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <canvas id="subjectAverageChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>المادة</th>
+                                <th>عدد الطلاب</th>
+                                <th>المتوسط</th>
+                                <th>أعلى درجة</th>
+                                <th>أقل درجة</th>
+                                <th>معدل النجاح</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for subject in grades_report %}
+                            <tr>
+                                <td>{{ subject.name }}</td>
+                                <td>{{ subject.students_count }}</td>
+                                <td>
+                                    <span class="badge bg-{% if subject.average >= 80 %}success{% elif subject.average >= 60 %}info{% elif subject.average >= 40 %}warning{% else %}danger{% endif %}">
+                                        {{ subject.average|floatformat:1 }}
+                                    </span>
+                                </td>
+                                <td>{{ subject.highest_grade }}</td>
+                                <td>{{ subject.lowest_grade }}</td>
+                                <td>
+                                    <span class="badge bg-{% if subject.pass_rate >= 80 %}success{% elif subject.pass_rate >= 60 %}info{% elif subject.pass_rate >= 40 %}warning{% else %}danger{% endif %}">
+                                        {{ subject.pass_rate|floatformat:1 }}%
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- تقرير الحضور -->
+{% if report_type == 'attendance' or not report_type %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-calendar-check me-2"></i>تقرير الحضور
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <canvas id="attendanceTrendChart" width="400" height="200"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <canvas id="attendanceByGradeChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>الصف</th>
+                                <th>عدد الطلاب</th>
+                                <th>معدل الحضور</th>
+                                <th>عدد الغياب</th>
+                                <th>عدد التأخير</th>
+                                <th>الحالة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for grade in attendance_report %}
+                            <tr>
+                                <td>{{ grade.grade_display }}</td>
+                                <td>{{ grade.students_count }}</td>
+                                <td>
+                                    <span class="badge bg-{% if grade.attendance_rate >= 80 %}success{% elif grade.attendance_rate >= 60 %}warning{% else %}danger{% endif %}">
+                                        {{ grade.attendance_rate|floatformat:1 }}%
+                                    </span>
+                                </td>
+                                <td>{{ grade.absent_count }}</td>
+                                <td>{{ grade.late_count }}</td>
+                                <td>
+                                    <span class="badge bg-{% if grade.attendance_rate >= 80 %}success{% elif grade.attendance_rate >= 60 %}warning{% else %}danger{% endif %}">
+                                        {{ grade.status_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- التقرير المالي -->
+{% if report_type == 'financial' or not report_type %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-currency-exchange me-2"></i>التقرير المالي
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <canvas id="paymentsTrendChart" width="400" height="200"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <canvas id="paymentsByTypeChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card bg-success text-white">
+                            <div class="card-body text-center">
+                                <h4>{{ total_collected }} دينار</h4>
+                                <p>إجمالي المحصل</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-warning text-white">
+                            <div class="card-body text-center">
+                                <h4>{{ total_pending }} دينار</h4>
+                                <p>المتبقي</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-info text-white">
+                            <div class="card-body text-center">
+                                <h4>{{ collection_rate|floatformat:1 }}%</h4>
+                                <p>معدل التحصيل</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // رسم بياني لتوزيع الدرجات
+    const gradesDistributionCtx = document.getElementById('gradesDistributionChart');
+    if (gradesDistributionCtx) {
+        new Chart(gradesDistributionCtx.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ['ممتاز (80-100)', 'جيد جداً (60-79)', 'جيد (40-59)', 'ضعيف (أقل من 40)'],
+                datasets: [{
+                    data: [{{ excellent_count }}, {{ very_good_count }}, {{ good_count }}, {{ weak_count }}],
+                    backgroundColor: ['#28a745', '#17a2b8', '#ffc107', '#dc3545']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+    
+    // رسم بياني لمتوسط المواد
+    const subjectAverageCtx = document.getElementById('subjectAverageChart');
+    if (subjectAverageCtx) {
+        new Chart(subjectAverageCtx.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: {{ subject_names|safe }},
+                datasets: [{
+                    label: 'المتوسط',
+                    data: {{ subject_averages|safe }},
+                    backgroundColor: '#007bff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+    }
+    
+    // رسم بياني لاتجاه الحضور
+    const attendanceTrendCtx = document.getElementById('attendanceTrendChart');
+    if (attendanceTrendCtx) {
+        new Chart(attendanceTrendCtx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: {{ attendance_dates|safe }},
+                datasets: [{
+                    label: 'معدل الحضور',
+                    data: {{ attendance_rates|safe }},
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+    }
+    
+    // رسم بياني للحضور حسب الصف
+    const attendanceByGradeCtx = document.getElementById('attendanceByGradeChart');
+    if (attendanceByGradeCtx) {
+        new Chart(attendanceByGradeCtx.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: {{ grade_names|safe }},
+                datasets: [{
+                    label: 'معدل الحضور',
+                    data: {{ grade_attendance_rates|safe }},
+                    backgroundColor: '#17a2b8'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+    }
+    
+    // رسم بياني لاتجاه المدفوعات
+    const paymentsTrendCtx = document.getElementById('paymentsTrendChart');
+    if (paymentsTrendCtx) {
+        new Chart(paymentsTrendCtx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: {{ payment_dates|safe }},
+                datasets: [{
+                    label: 'المدفوعات',
+                    data: {{ payment_amounts|safe }},
+                    borderColor: '#ffc107',
+                    backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+    
+    // رسم بياني للمدفوعات حسب النوع
+    const paymentsByTypeCtx = document.getElementById('paymentsByTypeChart');
+    if (paymentsByTypeCtx) {
+        new Chart(paymentsByTypeCtx.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: {{ payment_types|safe }},
+                datasets: [{
+                    data: {{ payment_type_amounts|safe }},
+                    backgroundColor: ['#28a745', '#17a2b8', '#ffc107', '#dc3545', '#6f42c1']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

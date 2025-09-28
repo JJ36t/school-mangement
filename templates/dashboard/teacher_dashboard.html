@@ -1,0 +1,360 @@
+{% extends 'base/base.html' %}
+
+{% block title %}لوحة تحكم المعلم - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-person-badge me-2"></i>
+                لوحة تحكم المعلم
+            </h2>
+            <div>
+                <a href="{% url 'subjects:class_list' %}" class="btn btn-primary me-2">
+                    <i class="bi bi-book me-2"></i>صفوفي
+                </a>
+                <a href="{% url 'students:student_list' %}" class="btn btn-success">
+                    <i class="bi bi-people me-2"></i>طلابي
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- إحصائيات سريعة -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ my_students_count }}</h4>
+                        <p class="card-text">طلابي</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-people display-4"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'students:student_list' %}" class="text-white text-decoration-none">
+                    <i class="bi bi-arrow-left me-1"></i>عرض التفاصيل
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ my_subjects_count }}</h4>
+                        <p class="card-text">موادي</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-book display-4"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'subjects:subject_list' %}" class="text-white text-decoration-none">
+                    <i class="bi bi-arrow-left me-1"></i>عرض التفاصيل
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ my_classes_count }}</h4>
+                        <p class="card-text">صفوفي</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-building display-4"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'subjects:class_list' %}" class="text-white text-decoration-none">
+                    <i class="bi bi-arrow-left me-1"></i>عرض التفاصيل
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ pending_grades_count }}</h4>
+                        <p class="card-text">درجات معلقة</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-clock display-4"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'grades:grade_list' %}" class="text-white text-decoration-none">
+                    <i class="bi bi-arrow-left me-1"></i>عرض التفاصيل
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- إحصائيات الحضور والدرجات -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-calendar-check me-2"></i>إحصائيات الحضور
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <div class="border-end">
+                            <h4 class="text-success mb-1">{{ attendance_rate|floatformat:1 }}%</h4>
+                            <small class="text-muted">معدل الحضور</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="border-end">
+                            <h4 class="text-warning mb-1">{{ late_count }}</h4>
+                            <small class="text-muted">متأخر</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <h4 class="text-danger mb-1">{{ absent_count }}</h4>
+                        <small class="text-muted">غائب</small>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'attendance:attendance_list' %}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i>عرض التفاصيل
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-award me-2"></i>إحصائيات الدرجات
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <div class="border-end">
+                            <h4 class="text-success mb-1">{{ average_grade|floatformat:1 }}</h4>
+                            <small class="text-muted">المتوسط العام</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="border-end">
+                            <h4 class="text-info mb-1">{{ excellent_students }}</h4>
+                            <small class="text-muted">متفوق</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <h4 class="text-warning mb-1">{{ weak_students }}</h4>
+                        <small class="text-muted">ضعيف</small>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'grades:grade_list' %}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i>عرض التفاصيل
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- صفوفي -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-book me-2"></i>صفوفي
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if my_classes %}
+                    <div class="row">
+                        {% for class in my_classes %}
+                            <div class="col-md-4 mb-3">
+                                <div class="card border-primary">
+                                    <div class="card-body">
+                                        <h6 class="card-title">{{ class.name }}</h6>
+                                        <p class="card-text">
+                                            <small class="text-muted">
+                                                {{ class.get_level_display }} - {{ class.get_grade_display }}
+                                            </small>
+                                        </p>
+                                        <p class="card-text">
+                                            <strong>عدد الطلاب:</strong> {{ class.students_count }}
+                                        </p>
+                                        <a href="{% url 'subjects:class_detail' class.id %}" class="btn btn-primary btn-sm">
+                                            <i class="bi bi-eye me-1"></i>عرض التفاصيل
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center">لا توجد صفوف مخصصة لك</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- موادي -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-book me-2"></i>موادي
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if my_subjects %}
+                    <div class="row">
+                        {% for subject in my_subjects %}
+                            <div class="col-md-4 mb-3">
+                                <div class="card border-success">
+                                    <div class="card-body">
+                                        <h6 class="card-title">{{ subject.name }}</h6>
+                                        <p class="card-text">
+                                            <small class="text-muted">
+                                                {{ subject.get_level_display }} - {{ subject.get_grade_display }}
+                                            </small>
+                                        </p>
+                                        <p class="card-text">
+                                            <strong>الساعات المعتمدة:</strong> {{ subject.credit_hours }}
+                                        </p>
+                                        <a href="{% url 'subjects:subject_detail' subject.id %}" class="btn btn-success btn-sm">
+                                            <i class="bi bi-eye me-1"></i>عرض التفاصيل
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center">لا توجد مواد مخصصة لك</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- الطلاب المتفوقين -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-award me-2"></i>الطلاب المتفوقين
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if top_students %}
+                    <div class="list-group list-group-flush">
+                        {% for student in top_students %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ student.student.user.get_full_name }}</h6>
+                                    <small class="text-muted">{{ student.student.student_id }}</small>
+                                </div>
+                                <span class="badge bg-success">{{ student.average_grade|floatformat:1 }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center">لا توجد بيانات كافية</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-exclamation-triangle me-2"></i>الطلاب المحتاجين متابعة
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if weak_students_list %}
+                    <div class="list-group list-group-flush">
+                        {% for student in weak_students_list %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ student.student.user.get_full_name }}</h6>
+                                    <small class="text-muted">{{ student.student.student_id }}</small>
+                                </div>
+                                <span class="badge bg-warning">{{ student.average_grade|floatformat:1 }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center">لا توجد بيانات كافية</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- الإجراءات السريعة -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-lightning me-2"></i>الإجراءات السريعة
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'grades:create_grade' %}" class="btn btn-primary w-100">
+                            <i class="bi bi-plus-circle me-2"></i>إضافة درجة
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'attendance:create_attendance' %}" class="btn btn-success w-100">
+                            <i class="bi bi-calendar-check me-2"></i>تسجيل حضور
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'grades:grade_list' %}" class="btn btn-info w-100">
+                            <i class="bi bi-list-ul me-2"></i>عرض الدرجات
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'attendance:attendance_list' %}" class="btn btn-warning w-100">
+                            <i class="bi bi-calendar me-2"></i>عرض الحضور
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

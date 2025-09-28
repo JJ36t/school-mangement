@@ -1,0 +1,109 @@
+{% extends 'base/base.html' %}
+
+{% block title %}تفاصيل الفصل - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-door-open me-2"></i>
+                تفاصيل الفصل
+            </h2>
+            <div>
+                <a href="{% url 'subjects:edit_class' class_obj.id %}" class="btn btn-warning me-2">
+                    <i class="bi bi-pencil me-2"></i>تعديل
+                </a>
+                <a href="{% url 'subjects:class_list' %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-right me-2"></i>العودة للقائمة
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-info-circle me-2"></i>معلومات الفصل
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>اسم الفصل</h6>
+                        <p class="text-muted">{{ class_obj.name }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>القسم</h6>
+                        <p class="text-muted">{{ class_obj.section }}</p>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>المرحلة</h6>
+                        <p class="text-muted">{{ class_obj.get_level_display }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>الصف</h6>
+                        <p class="text-muted">{{ class_obj.get_grade_display }}</p>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>السعة</h6>
+                        <p class="text-muted">{{ class_obj.capacity }} طالب</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>الموقع</h6>
+                        <p class="text-muted">{{ class_obj.location|default:"غير محدد" }}</p>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>معلم الفصل</h6>
+                        <p class="text-muted">
+                            {% if class_obj.class_teacher %}
+                                {{ class_obj.class_teacher.user.get_full_name }}
+                            {% else %}
+                                غير محدد
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>الحالة</h6>
+                        <p>
+                            {% if class_obj.is_active %}
+                                <span class="badge bg-success">نشط</span>
+                            {% else %}
+                                <span class="badge bg-danger">غير نشط</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-people me-2"></i>إحصائيات
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center">
+                    <h3 class="text-primary">{{ class_obj.capacity }}</h3>
+                    <p class="text-muted">السعة الإجمالية</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

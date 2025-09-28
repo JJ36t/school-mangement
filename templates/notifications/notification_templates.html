@@ -1,0 +1,161 @@
+{% extends 'base/base.html' %}
+
+{% block title %}قوالب الإشعارات - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-file-earmark-text me-2"></i>
+                قوالب الإشعارات
+            </h2>
+            <a href="{% url 'notifications:create_template' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>إنشاء قالب جديد
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h5 class="mb-0">
+                            <i class="bi bi-list-ul me-2"></i>جميع القوالب
+                        </h5>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="البحث عن قالب..." id="searchInput">
+                            <button class="btn btn-outline-secondary" type="button">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if templates %}
+                    <div class="row">
+                        {% for template in templates %}
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0">
+                                        <i class="bi bi-file-earmark-text me-2"></i>{{ template.name }}
+                                    </h6>
+                                    <span class="badge bg-{% if template.template_type == 'email' %}primary{% elif template.template_type == 'sms' %}success{% elif template.template_type == 'push' %}info{% else %}secondary{% endif %}">
+                                        {{ template.get_template_type_display }}
+                                    </span>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text text-muted">{{ template.description|truncatechars:100 }}</p>
+                                    <div class="mb-2">
+                                        <small class="text-muted">
+                                            <strong>الغرض:</strong> {{ template.get_purpose_display }}
+                                        </small>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small class="text-muted">
+                                            <strong>المتغيرات:</strong> {{ template.variables|truncatechars:50 }}
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="btn-group w-100" role="group">
+                                        <a href="{% url 'notifications:template_detail' template.id %}" class="btn btn-outline-info btn-sm" title="عرض">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{% url 'notifications:edit_template' template.id %}" class="btn btn-outline-warning btn-sm" title="تعديل">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="{% url 'notifications:use_template' template.id %}" class="btn btn-outline-success btn-sm" title="استخدام">
+                                            <i class="bi bi-send"></i>
+                                        </a>
+                                        <a href="{% url 'notifications:delete_template' template.id %}" class="btn btn-outline-danger btn-sm" title="حذف">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-file-earmark-text display-1 text-muted"></i>
+                        <h4 class="text-muted mt-3">لا توجد قوالب</h4>
+                        <p class="text-muted">لم يتم إنشاء أي قوالب إشعارات بعد.</p>
+                        <a href="{% url 'notifications:create_template' %}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-2"></i>إنشاء أول قالب
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-info-circle me-2"></i>معلومات القوالب
+                </h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li><i class="bi bi-check-circle text-success me-2"></i>القوالب تساعد في توحيد شكل الإشعارات</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i>يمكن استخدام المتغيرات في القوالب</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i>دعم أنواع مختلفة من القوالب</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i>سهولة إعادة الاستخدام</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-lightbulb me-2"></i>نصائح للقوالب
+                </h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li><i class="bi bi-lightbulb text-warning me-2"></i>استخدم أسماء واضحة للقوالب</li>
+                    <li><i class="bi bi-lightbulb text-warning me-2"></i>أضف وصف مفصل للغرض</li>
+                    <li><i class="bi bi-lightbulb text-warning me-2"></i>حدد المتغيرات المستخدمة</li>
+                    <li><i class="bi bi-lightbulb text-warning me-2"></i>اختبر القوالب قبل الاستخدام</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const cards = document.querySelectorAll('.col-md-6.col-lg-4');
+        
+        cards.forEach(card => {
+            const text = card.textContent.toLowerCase();
+            if (text.includes(searchTerm)) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

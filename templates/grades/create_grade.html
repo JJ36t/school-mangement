@@ -1,0 +1,150 @@
+{% extends 'base/base.html' %}
+
+{% block title %}إضافة درجة جديدة - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-plus-circle me-2"></i>
+                إضافة درجة جديدة
+            </h2>
+            <a href="{% url 'grades:grade_list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-right me-2"></i>العودة للقائمة
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-award me-2"></i>معلومات الدرجة
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.student.id_for_label }}" class="form-label">الطالب *</label>
+                                {{ form.student }}
+                                {% if form.student.errors %}
+                                    <div class="text-danger">{{ form.student.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.subject.id_for_label }}" class="form-label">المادة *</label>
+                                {{ form.subject }}
+                                {% if form.subject.errors %}
+                                    <div class="text-danger">{{ form.subject.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.teacher.id_for_label }}" class="form-label">المعلم *</label>
+                                {{ form.teacher }}
+                                {% if form.teacher.errors %}
+                                    <div class="text-danger">{{ form.teacher.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.exam_type.id_for_label }}" class="form-label">نوع الامتحان *</label>
+                                {{ form.exam_type }}
+                                {% if form.exam_type.errors %}
+                                    <div class="text-danger">{{ form.exam_type.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.score.id_for_label }}" class="form-label">الدرجة المحققة *</label>
+                                {{ form.score }}
+                                {% if form.score.errors %}
+                                    <div class="text-danger">{{ form.score.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.max_score.id_for_label }}" class="form-label">الدرجة الكاملة *</label>
+                                {{ form.max_score }}
+                                {% if form.max_score.errors %}
+                                    <div class="text-danger">{{ form.max_score.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.exam_date.id_for_label }}" class="form-label">تاريخ الامتحان *</label>
+                                {{ form.exam_date }}
+                                {% if form.exam_date.errors %}
+                                    <div class="text-danger">{{ form.exam_date.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.semester.id_for_label }}" class="form-label">الفصل الدراسي</label>
+                                {{ form.semester }}
+                                {% if form.semester.errors %}
+                                    <div class="text-danger">{{ form.semester.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.notes.id_for_label }}" class="form-label">ملاحظات</label>
+                        {{ form.notes }}
+                        {% if form.notes.errors %}
+                            <div class="text-danger">{{ form.notes.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'grades:grade_list' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-right me-2"></i>إلغاء
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-2"></i>حفظ الدرجة
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-body">
+                <h6 class="card-title">
+                    <i class="bi bi-info-circle me-2"></i>معلومات مفيدة
+                </h6>
+                <ul class="list-unstyled mb-0">
+                    <li><i class="bi bi-check-circle text-success me-2"></i>سيتم حساب النسبة المئوية والتقدير تلقائياً</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i>يمكن إضافة ملاحظات إضافية للدرجة</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i>تأكد من اختيار المعلم الصحيح للمادة</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

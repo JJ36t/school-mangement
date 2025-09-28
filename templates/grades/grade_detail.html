@@ -1,0 +1,254 @@
+{% extends 'base/base.html' %}
+
+{% block title %}تفاصيل الدرجة - {{ grade.student.user.get_full_name }} - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-award me-2"></i>
+                تفاصيل الدرجة
+            </h2>
+            <div>
+                <a href="{% url 'grades:edit_grade' grade.id %}" class="btn btn-warning me-2">
+                    <i class="bi bi-pencil me-2"></i>تعديل
+                </a>
+                <a href="{% url 'grades:grade_list' %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-right me-2"></i>العودة للقائمة
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-award me-2"></i>معلومات الدرجة
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>الطالب:</strong>
+                            <p class="mb-0">
+                                <div class="d-flex align-items-center">
+                                    {% if grade.student.user.profile_picture %}
+                                        <img src="{{ grade.student.user.profile_picture.url }}" alt="صورة الطالب" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                    {% else %}
+                                        <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                                            <i class="bi bi-person-fill text-white"></i>
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <h6 class="mb-0">{{ grade.student.user.get_full_name }}</h6>
+                                        <small class="text-muted">{{ grade.student.student_id }}</small>
+                                    </div>
+                                </div>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>المادة:</strong>
+                            <p class="mb-0">
+                                <div>
+                                    <h6 class="mb-0">{{ grade.subject.name }}</h6>
+                                    <small class="text-muted">{{ grade.subject.code }}</small>
+                                </div>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>نوع الامتحان:</strong>
+                            <p class="mb-0">
+                                <span class="badge bg-{% if grade.exam_type == 'midterm' %}warning{% elif grade.exam_type == 'final' %}danger{% elif grade.exam_type == 'practical' %}info{% else %}secondary{% endif %} fs-6">
+                                    {{ grade.get_exam_type_display }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>تاريخ الامتحان:</strong>
+                            <p class="mb-0">{{ grade.exam_date|date:"Y-m-d" }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>الدرجة المحققة:</strong>
+                            <p class="mb-0">
+                                <span class="fw-bold fs-5">{{ grade.score }}</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>الدرجة الكاملة:</strong>
+                            <p class="mb-0">
+                                <span class="fw-bold fs-5">{{ grade.max_score }}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>النسبة المئوية:</strong>
+                            <p class="mb-0">
+                                <div class="progress" style="width: 200px; height: 25px;">
+                                    <div class="progress-bar bg-{% if grade.percentage >= 90 %}success{% elif grade.percentage >= 80 %}info{% elif grade.percentage >= 70 %}warning{% else %}danger{% endif %}" 
+                                         role="progressbar" 
+                                         style="width: {{ grade.percentage }}%"
+                                         aria-valuenow="{{ grade.percentage }}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                        {{ grade.percentage }}%
+                                    </div>
+                                </div>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>التقدير:</strong>
+                            <p class="mb-0">
+                                <span class="badge bg-{% if grade.grade_letter == 'A+' or grade.grade_letter == 'A' %}success{% elif grade.grade_letter == 'B+' or grade.grade_letter == 'B' %}info{% elif grade.grade_letter == 'C+' or grade.grade_letter == 'C' %}warning{% else %}danger{% endif %} fs-4">
+                                    {{ grade.grade_letter }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if grade.notes %}
+                <div class="mb-3">
+                    <strong>ملاحظات:</strong>
+                    <p class="mb-0">{{ grade.notes }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-person-workspace me-2"></i>معلومات المعلم
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    {% if grade.teacher.user.profile_picture %}
+                        <img src="{{ grade.teacher.user.profile_picture.url }}" alt="صورة المعلم" class="rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                    {% else %}
+                        <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+                            <i class="bi bi-person-fill text-white" style="font-size: 1.5rem;"></i>
+                        </div>
+                    {% endif %}
+                    <div>
+                        <h5 class="mb-1">{{ grade.teacher.user.get_full_name }}</h5>
+                        <p class="text-muted mb-1">{{ grade.teacher.specialization }}</p>
+                        <small class="text-muted">{{ grade.teacher.user.email }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-graph-up me-2"></i>تحليل الأداء
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <div class="display-4 fw-bold text-{% if grade.percentage >= 90 %}success{% elif grade.percentage >= 80 %}info{% elif grade.percentage >= 70 %}warning{% else %}danger{% endif %}">
+                        {{ grade.percentage }}%
+                    </div>
+                    <p class="text-muted">النسبة المئوية</p>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>التقييم:</strong>
+                    <p class="mb-0">
+                        {% if grade.percentage >= 90 %}
+                            <span class="badge bg-success fs-6">ممتاز</span>
+                        {% elif grade.percentage >= 80 %}
+                            <span class="badge bg-info fs-6">جيد جداً</span>
+                        {% elif grade.percentage >= 70 %}
+                            <span class="badge bg-warning fs-6">جيد</span>
+                        {% elif grade.percentage >= 60 %}
+                            <span class="badge bg-secondary fs-6">مقبول</span>
+                        {% else %}
+                            <span class="badge bg-danger fs-6">ضعيف</span>
+                        {% endif %}
+                    </p>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>الدرجة المفقودة:</strong>
+                    <p class="mb-0">{{ grade.max_score|add:"-"|add:grade.score }}</p>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>الفصل الدراسي:</strong>
+                    <p class="mb-0">{{ grade.semester|default:"غير محدد" }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-calendar me-2"></i>معلومات إضافية
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>تاريخ الإنشاء:</strong>
+                    <p class="mb-0">{{ grade.created_at|date:"Y-m-d H:i" }}</p>
+                </div>
+                <div class="mb-3">
+                    <strong>آخر تحديث:</strong>
+                    <p class="mb-0">{{ grade.updated_at|date:"Y-m-d H:i" }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-tools me-2"></i>الإجراءات السريعة
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'grades:edit_grade' grade.id %}" class="btn btn-warning">
+                        <i class="bi bi-pencil me-2"></i>تعديل الدرجة
+                    </a>
+                    <a href="{% url 'grades:student_grades' grade.student.id %}" class="btn btn-info">
+                        <i class="bi bi-person me-2"></i>درجات الطالب
+                    </a>
+                    <a href="{% url 'grades:subject_grades' grade.subject.id %}" class="btn btn-secondary">
+                        <i class="bi bi-book me-2"></i>درجات المادة
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

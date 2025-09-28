@@ -1,0 +1,102 @@
+{% extends 'base/base.html' %}
+
+{% block title %}إلغاء تعيين مادة - {{ teacher.user.get_full_name }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-1">
+                    <i class="bi bi-trash text-danger me-2"></i>
+                    إلغاء تعيين مادة
+                </h2>
+                <p class="text-muted mb-0">{{ teacher.user.get_full_name }}</p>
+            </div>
+            <a href="{% url 'teachers:teacher_subjects' teacher.id %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-right me-2"></i>العودة للمواد
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    تأكيد الإلغاء
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-danger" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>تحذير!</strong> هل أنت متأكد من أنك تريد إلغاء تعيين هذه المادة للمعلم؟
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-muted">معلومات المعلم:</h6>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>اسم المعلم:</strong></td>
+                                <td>{{ teacher.user.get_full_name }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>رقم المعلم:</strong></td>
+                                <td>{{ teacher.teacher_id }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>التخصص:</strong></td>
+                                <td>{{ teacher.specialization }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted">معلومات المادة:</h6>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>اسم المادة:</strong></td>
+                                <td>{{ subject.name }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>رمز المادة:</strong></td>
+                                <td>{{ subject.code }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>المرحلة:</strong></td>
+                                <td>
+                                    <span class="badge bg-{% if subject.level == 'elementary' %}success{% elif subject.level == 'middle' %}warning{% else %}info{% endif %}">
+                                        {{ subject.get_level_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>الصف:</strong></td>
+                                <td>{{ subject.get_grade_display }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'teachers:teacher_subjects' teacher.id %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-right me-1"></i>
+                                إلغاء
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash me-1"></i>
+                                تأكيد الإلغاء
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

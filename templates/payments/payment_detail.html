@@ -1,0 +1,274 @@
+{% extends 'base/base.html' %}
+
+{% block title %}تفاصيل الدفعة - {{ payment.student.user.get_full_name }} - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-credit-card me-2"></i>
+                تفاصيل الدفعة
+            </h2>
+            <div>
+                <a href="{% url 'payments:edit_payment' payment.id %}" class="btn btn-warning me-2">
+                    <i class="bi bi-pencil me-2"></i>تعديل
+                </a>
+                {% if payment.status != 'paid' %}
+                    <a href="{% url 'payments:mark_paid' payment.id %}" class="btn btn-success me-2">
+                        <i class="bi bi-check-lg me-2"></i>تسجيل الدفع
+                    </a>
+                {% endif %}
+                <a href="{% url 'payments:payment_list' %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-right me-2"></i>العودة للقائمة
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-credit-card me-2"></i>معلومات الدفعة
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>الطالب:</strong>
+                            <p class="mb-0">
+                                <div class="d-flex align-items-center">
+                                    {% if payment.student.user.profile_picture %}
+                                        <img src="{{ payment.student.user.profile_picture.url }}" alt="صورة الطالب" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                    {% else %}
+                                        <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                                            <i class="bi bi-person-fill text-white"></i>
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <h6 class="mb-0">{{ payment.student.user.get_full_name }}</h6>
+                                        <small class="text-muted">{{ payment.student.student_id }}</small>
+                                    </div>
+                                </div>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>نوع الدفعة:</strong>
+                            <p class="mb-0">
+                                <span class="badge bg-info fs-6">{{ payment.get_payment_type_display }}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>المبلغ:</strong>
+                            <p class="mb-0">
+                                <span class="fw-bold text-success fs-4">{{ payment.amount }} دينار</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>تاريخ الاستحقاق:</strong>
+                            <p class="mb-0">{{ payment.due_date|date:"Y-m-d" }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>تاريخ الدفع:</strong>
+                            <p class="mb-0">
+                                {% if payment.payment_date %}
+                                    <span class="text-success fs-5">{{ payment.payment_date|date:"Y-m-d" }}</span>
+                                {% else %}
+                                    <span class="text-muted">لم يتم الدفع</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>طريقة الدفع:</strong>
+                            <p class="mb-0">
+                                {% if payment.payment_method %}
+                                    <span class="badge bg-secondary">{{ payment.get_payment_method_display }}</span>
+                                {% else %}
+                                    <span class="text-muted">غير محدد</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>حالة الدفع:</strong>
+                            <p class="mb-0">
+                                {% if payment.status == 'paid' %}
+                                    <span class="badge bg-success fs-6">
+                                        <i class="bi bi-check-circle me-1"></i>مدفوع
+                                    </span>
+                                {% elif payment.status == 'pending' %}
+                                    <span class="badge bg-warning fs-6">
+                                        <i class="bi bi-clock me-1"></i>معلق
+                                    </span>
+                                {% elif payment.status == 'overdue' %}
+                                    <span class="badge bg-danger fs-6">
+                                        <i class="bi bi-exclamation-triangle me-1"></i>متأخر
+                                    </span>
+                                {% elif payment.status == 'cancelled' %}
+                                    <span class="badge bg-secondary fs-6">
+                                        <i class="bi bi-x-circle me-1"></i>ملغي
+                                    </span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>الفصل الدراسي:</strong>
+                            <p class="mb-0">{{ payment.semester|default:"غير محدد" }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if payment.notes %}
+                <div class="mb-3">
+                    <strong>ملاحظات:</strong>
+                    <p class="mb-0">{{ payment.notes }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-person-badge me-2"></i>معلومات الطالب
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    {% if payment.student.user.profile_picture %}
+                        <img src="{{ payment.student.user.profile_picture.url }}" alt="صورة الطالب" class="rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                    {% else %}
+                        <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+                            <i class="bi bi-person-fill text-white" style="font-size: 1.5rem;"></i>
+                        </div>
+                    {% endif %}
+                    <div>
+                        <h5 class="mb-1">{{ payment.student.user.get_full_name }}</h5>
+                        <p class="text-muted mb-1">{{ payment.student.student_id }}</p>
+                        <small class="text-muted">{{ payment.student.get_grade_display }} - {{ payment.student.section }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-graph-up me-2"></i>تحليل الدفعة
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    {% if payment.status == 'paid' %}
+                        <div class="display-4 fw-bold text-success">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                        <p class="text-success">مدفوع</p>
+                    {% elif payment.status == 'pending' %}
+                        <div class="display-4 fw-bold text-warning">
+                            <i class="bi bi-clock"></i>
+                        </div>
+                        <p class="text-warning">معلق</p>
+                    {% elif payment.status == 'overdue' %}
+                        <div class="display-4 fw-bold text-danger">
+                            <i class="bi bi-exclamation-triangle"></i>
+                        </div>
+                        <p class="text-danger">متأخر</p>
+                    {% elif payment.status == 'cancelled' %}
+                        <div class="display-4 fw-bold text-secondary">
+                            <i class="bi bi-x-circle"></i>
+                        </div>
+                        <p class="text-secondary">ملغي</p>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <strong>المبلغ:</strong>
+                    <p class="mb-0">{{ payment.amount }} دينار</p>
+                </div>
+                
+                {% if payment.is_overdue %}
+                <div class="mb-3">
+                    <strong>أيام التأخير:</strong>
+                    <p class="mb-0 text-danger">{{ payment.days_overdue }} يوم</p>
+                </div>
+                {% endif %}
+                
+                <div class="mb-3">
+                    <strong>نوع الدفعة:</strong>
+                    <p class="mb-0">{{ payment.get_payment_type_display }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-calendar me-2"></i>معلومات إضافية
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>تاريخ الإنشاء:</strong>
+                    <p class="mb-0">{{ payment.created_at|date:"Y-m-d H:i" }}</p>
+                </div>
+                <div class="mb-3">
+                    <strong>آخر تحديث:</strong>
+                    <p class="mb-0">{{ payment.updated_at|date:"Y-m-d H:i" }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-tools me-2"></i>الإجراءات السريعة
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'payments:edit_payment' payment.id %}" class="btn btn-warning">
+                        <i class="bi bi-pencil me-2"></i>تعديل الدفعة
+                    </a>
+                    {% if payment.status != 'paid' %}
+                        <a href="{% url 'payments:mark_paid' payment.id %}" class="btn btn-success">
+                            <i class="bi bi-check-lg me-2"></i>تسجيل الدفع
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'payments:student_payments' payment.student.id %}" class="btn btn-info">
+                        <i class="bi bi-person me-2"></i>مدفوعات الطالب
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

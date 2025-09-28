@@ -1,0 +1,206 @@
+{% extends 'base/base.html' %}
+
+{% block title %}قائمة الإشعارات والتنبيهات - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-bell me-2"></i>
+                قائمة الإشعارات والتنبيهات
+            </h2>
+            <a href="{% url 'notifications:create_notification' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>إرسال إشعار جديد
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h5 class="mb-0">
+                            <i class="bi bi-list-ul me-2"></i>جميع الإشعارات
+                        </h5>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="البحث عن إشعار..." id="searchInput">
+                            <button class="btn btn-outline-secondary" type="button">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if page_obj %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>العنوان</th>
+                                    <th>النوع</th>
+                                    <th>المستقبلون</th>
+                                    <th>تاريخ الإرسال</th>
+                                    <th>الحالة</th>
+                                    <th>الأولوية</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for notification in page_obj %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if notification.notification_type == 'urgent' %}
+                                                <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>
+                                            {% elif notification.notification_type == 'info' %}
+                                                <i class="bi bi-info-circle-fill text-info me-2"></i>
+                                            {% elif notification.notification_type == 'warning' %}
+                                                <i class="bi bi-exclamation-circle-fill text-warning me-2"></i>
+                                            {% elif notification.notification_type == 'success' %}
+                                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                            {% else %}
+                                                <i class="bi bi-bell-fill text-secondary me-2"></i>
+                                            {% endif %}
+                                            <div>
+                                                <h6 class="mb-0">{{ notification.title }}</h6>
+                                                <small class="text-muted">{{ notification.message|truncatechars:50 }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{% if notification.notification_type == 'urgent' %}danger{% elif notification.notification_type == 'info' %}info{% elif notification.notification_type == 'warning' %}warning{% elif notification.notification_type == 'success' %}success{% else %}secondary{% endif %}">
+                                            {{ notification.get_notification_type_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if notification.recipient_type == 'all' %}
+                                            <span class="badge bg-primary">الجميع</span>
+                                        {% elif notification.recipient_type == 'students' %}
+                                            <span class="badge bg-success">الطلاب</span>
+                                        {% elif notification.recipient_type == 'teachers' %}
+                                            <span class="badge bg-info">المعلمون</span>
+                                        {% elif notification.recipient_type == 'parents' %}
+                                            <span class="badge bg-warning">أولياء الأمور</span>
+                                        {% elif notification.recipient_type == 'specific' %}
+                                            <span class="badge bg-secondary">محدد</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ notification.sent_at|date:"Y-m-d H:i" }}</td>
+                                    <td>
+                                        {% if notification.is_sent %}
+                                            <span class="badge bg-success fs-6">
+                                                <i class="bi bi-check-circle me-1"></i>مرسل
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-warning fs-6">
+                                                <i class="bi bi-clock me-1"></i>معلق
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if notification.priority == 'high' %}
+                                            <span class="badge bg-danger">عالي</span>
+                                        {% elif notification.priority == 'medium' %}
+                                            <span class="badge bg-warning">متوسط</span>
+                                        {% elif notification.priority == 'low' %}
+                                            <span class="badge bg-success">منخفض</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'notifications:notification_detail' notification.id %}" class="btn btn-sm btn-outline-info" title="عرض التفاصيل">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="{% url 'notifications:edit_notification' notification.id %}" class="btn btn-sm btn-outline-warning" title="تعديل">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            {% if not notification.is_sent %}
+                                                <a href="{% url 'notifications:send_notification' notification.id %}" class="btn btn-sm btn-outline-success" title="إرسال">
+                                                    <i class="bi bi-send"></i>
+                                                </a>
+                                            {% endif %}
+                                            <a href="{% url 'notifications:delete_notification' notification.id %}" class="btn btn-sm btn-outline-danger" title="حذف">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    {% if page_obj.has_other_pages %}
+                        <nav aria-label="صفحات الإشعارات">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1">الأولى</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">السابقة</a>
+                                    </li>
+                                {% endif %}
+                                
+                                <li class="page-item active">
+                                    <span class="page-link">
+                                        صفحة {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}
+                                    </span>
+                                </li>
+                                
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">التالية</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">الأخيرة</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-bell display-1 text-muted"></i>
+                        <h4 class="text-muted mt-3">لا توجد إشعارات</h4>
+                        <p class="text-muted">لم يتم إرسال أي إشعارات بعد.</p>
+                        <a href="{% url 'notifications:create_notification' %}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-2"></i>إرسال أول إشعار
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const tableRows = document.querySelectorAll('tbody tr');
+        
+        tableRows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            if (text.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

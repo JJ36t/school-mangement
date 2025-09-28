@@ -1,0 +1,78 @@
+{% extends 'base/base.html' %}
+
+{% block title %}لوحة التحكم - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-speedometer2 me-2"></i>
+                لوحة التحكم
+            </h2>
+            <div class="text-muted">
+                مرحباً، {{ user.get_full_name|default:user.username }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="stats-card text-center">
+            <i class="bi bi-people stats-icon"></i>
+            <div class="stats-number">0</div>
+            <div class="stats-label">إجمالي الطلاب</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card text-center">
+            <i class="bi bi-person-workspace stats-icon"></i>
+            <div class="stats-number">0</div>
+            <div class="stats-label">إجمالي المعلمين</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card text-center">
+            <i class="bi bi-book stats-icon"></i>
+            <div class="stats-number">0</div>
+            <div class="stats-label">إجمالي المواد</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card text-center">
+            <i class="bi bi-award stats-icon"></i>
+            <div class="stats-number">0</div>
+            <div class="stats-label">إجمالي الدرجات</div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-graph-up me-2"></i>الإحصائيات الحديثة
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">سيتم عرض الإحصائيات الحديثة هنا عند إضافة البيانات.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-bell me-2"></i>الإشعارات الحديثة
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">لا توجد إشعارات جديدة.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

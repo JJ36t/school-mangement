@@ -1,0 +1,140 @@
+{% extends 'base/base.html' %}
+
+{% block title %}إرسال إشعار جديد - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-plus-circle me-2"></i>
+                إرسال إشعار جديد
+            </h2>
+            <a href="{% url 'notifications:notification_list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-right me-2"></i>العودة للقائمة
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-bell me-2"></i>معلومات الإشعار
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="{{ form.title.id_for_label }}" class="form-label">عنوان الإشعار *</label>
+                                {{ form.title }}
+                                {% if form.title.errors %}
+                                    <div class="text-danger">{{ form.title.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="{{ form.notification_type.id_for_label }}" class="form-label">نوع الإشعار *</label>
+                                {{ form.notification_type }}
+                                {% if form.notification_type.errors %}
+                                    <div class="text-danger">{{ form.notification_type.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.message.id_for_label }}" class="form-label">نص الإشعار *</label>
+                        {{ form.message }}
+                        {% if form.message.errors %}
+                            <div class="text-danger">{{ form.message.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.recipient_type.id_for_label }}" class="form-label">نوع المستقبلين *</label>
+                                {{ form.recipient_type }}
+                                {% if form.recipient_type.errors %}
+                                    <div class="text-danger">{{ form.recipient_type.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.priority.id_for_label }}" class="form-label">الأولوية *</label>
+                                {{ form.priority }}
+                                {% if form.priority.errors %}
+                                    <div class="text-danger">{{ form.priority.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.scheduled_at.id_for_label }}" class="form-label">تاريخ الإرسال المجدول</label>
+                                {{ form.scheduled_at }}
+                                {% if form.scheduled_at.errors %}
+                                    <div class="text-danger">{{ form.scheduled_at.errors }}</div>
+                                {% endif %}
+                                <div class="form-text">اتركه فارغاً للإرسال الفوري</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.channel.id_for_label }}" class="form-label">قناة الإرسال *</label>
+                                {{ form.channel }}
+                                {% if form.channel.errors %}
+                                    <div class="text-danger">{{ form.channel.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.attachments.id_for_label }}" class="form-label">مرفقات</label>
+                        {{ form.attachments }}
+                        {% if form.attachments.errors %}
+                            <div class="text-danger">{{ form.attachments.errors }}</div>
+                        {% endif %}
+                        <div class="form-text">يمكن إرفاق ملفات إضافية مع الإشعار</div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'notifications:notification_list' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-right me-2"></i>إلغاء
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send me-2"></i>إرسال الإشعار
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-body">
+                <h6 class="card-title">
+                    <i class="bi bi-info-circle me-2"></i>معلومات مفيدة
+                </h6>
+                <ul class="list-unstyled mb-0">
+                    <li><i class="bi bi-check-circle text-success me-2"></i>يمكن جدولة الإشعارات للإرسال لاحقاً</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i>اختر نوع الإشعار المناسب للمحتوى</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i>حدد الأولوية حسب أهمية الإشعار</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i>يمكن إرفاق ملفات مع الإشعار</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

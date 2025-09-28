@@ -1,0 +1,188 @@
+{% extends 'base/base.html' %}
+
+{% block title %}قائمة المواد - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-book me-2"></i>
+                قائمة المواد
+            </h2>
+            <a href="{% url 'subjects:create_subject' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>إضافة مادة جديدة
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h5 class="mb-0">
+                            <i class="bi bi-list-ul me-2"></i>جميع المواد
+                        </h5>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="البحث عن مادة..." id="searchInput">
+                            <button class="btn btn-outline-secondary" type="button">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if page_obj %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>رمز المادة</th>
+                                    <th>اسم المادة</th>
+                                    <th>الوصف</th>
+                                    <th>المرحلة</th>
+                                    <th>عدد الساعات</th>
+                                    <th>المعلم المخصص</th>
+                                    <th>الحالة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for subject in page_obj %}
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-primary">{{ subject.code }}</span>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <h6 class="mb-0">{{ subject.name }}</h6>
+                                            <small class="text-muted">{{ subject.name_en }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="text-truncate d-inline-block" style="max-width: 200px;" title="{{ subject.description }}">
+                                            {{ subject.description|truncatechars:50 }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ subject.get_level_display }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ subject.credit_hours }} ساعة</span>
+                                    </td>
+                                    <td>
+                                        {% if subject.teachers.exists %}
+                                            <div class="d-flex flex-wrap gap-1">
+                                                {% for teacher_subject in subject.teachersubject_set.all|slice:":2" %}
+                                                    <span class="badge bg-success">{{ teacher_subject.teacher.user.get_full_name }}</span>
+                                                {% endfor %}
+                                                {% if subject.teachersubject_set.count > 2 %}
+                                                    <span class="badge bg-light text-dark">+{{ subject.teachersubject_set.count|add:"-2" }}</span>
+                                                {% endif %}
+                                            </div>
+                                        {% else %}
+                                            <span class="text-muted">غير مخصص</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if subject.is_active %}
+                                            <span class="badge bg-success">نشط</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">غير نشط</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'subjects:subject_detail' subject.id %}" class="btn btn-sm btn-outline-info" title="عرض التفاصيل">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="{% url 'subjects:edit_subject' subject.id %}" class="btn btn-sm btn-outline-warning" title="تعديل">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a href="{% url 'subjects:assign_teacher' subject.id %}" class="btn btn-sm btn-outline-primary" title="تخصيص معلم">
+                                                <i class="bi bi-person-plus"></i>
+                                            </a>
+                                            <a href="{% url 'subjects:delete_subject' subject.id %}" class="btn btn-sm btn-outline-danger" title="حذف">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    {% if page_obj.has_other_pages %}
+                        <nav aria-label="صفحات المواد">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1">الأولى</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">السابقة</a>
+                                    </li>
+                                {% endif %}
+                                
+                                <li class="page-item active">
+                                    <span class="page-link">
+                                        صفحة {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}
+                                    </span>
+                                </li>
+                                
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">التالية</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">الأخيرة</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-book display-1 text-muted"></i>
+                        <h4 class="text-muted mt-3">لا توجد مواد</h4>
+                        <p class="text-muted">لم يتم إضافة أي مواد بعد.</p>
+                        <a href="{% url 'subjects:create_subject' %}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-2"></i>إضافة أول مادة
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const tableRows = document.querySelectorAll('tbody tr');
+        
+        tableRows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            if (text.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

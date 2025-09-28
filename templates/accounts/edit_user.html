@@ -1,0 +1,222 @@
+{% extends 'base/base.html' %}
+
+{% block title %}تعديل المستخدم - {{ user_obj.get_full_name }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-1">
+                    <i class="bi bi-pencil-square text-primary me-2"></i>
+                    تعديل المستخدم
+                </h2>
+                <p class="text-muted mb-0">{{ user_obj.get_full_name }}</p>
+            </div>
+            <a href="{% url 'accounts:user_detail' user_obj.id %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-right me-2"></i>العودة للتفاصيل
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-person-badge me-2"></i>معلومات المستخدم
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" enctype="multipart/form-data" id="userForm">
+                    {% csrf_token %}
+                    
+                    <!-- معلومات المستخدم الأساسية -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-primary rounded-circle p-2 me-3">
+                                    <i class="bi bi-person text-white"></i>
+                                </div>
+                                <h6 class="text-primary mb-0 fw-bold">معلومات المستخدم الأساسية</h6>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                {{ form.username }}
+                                <label for="{{ form.username.id_for_label }}">اسم المستخدم *</label>
+                                {% if form.username.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.username.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                {{ form.email }}
+                                <label for="{{ form.email.id_for_label }}">البريد الإلكتروني *</label>
+                                {% if form.email.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.email.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                {{ form.first_name }}
+                                <label for="{{ form.first_name.id_for_label }}">الاسم الأول *</label>
+                                {% if form.first_name.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.first_name.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                {{ form.last_name }}
+                                <label for="{{ form.last_name.id_for_label }}">الاسم الأخير *</label>
+                                {% if form.last_name.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.last_name.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                {{ form.role }}
+                                <label for="{{ form.role.id_for_label }}">نوع الحساب *</label>
+                                {% if form.role.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.role.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                {{ form.phone }}
+                                <label for="{{ form.phone.id_for_label }}">رقم الهاتف</label>
+                                {% if form.phone.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.phone.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                {{ form.date_of_birth }}
+                                <label for="{{ form.date_of_birth.id_for_label }}">تاريخ الميلاد</label>
+                                {% if form.date_of_birth.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.date_of_birth.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                {{ form.profile_picture }}
+                                <label for="{{ form.profile_picture.id_for_label }}">صورة الملف الشخصي</label>
+                                {% if form.profile_picture.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.profile_picture.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mt-2">
+                        <div class="col-12">
+                            <div class="form-floating">
+                                {{ form.address }}
+                                <label for="{{ form.address.id_for_label }}">العنوان</label>
+                                {% if form.address.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.address.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                {{ form.is_active }}
+                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                    حساب نشط
+                                </label>
+                                {% if form.is_active.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.is_active.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- أزرار التحكم -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between">
+                                <a href="{% url 'accounts:user_detail' user_obj.id %}" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-right me-1"></i>
+                                    إلغاء
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-lg me-1"></i>
+                                    حفظ التغييرات
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // إضافة Bootstrap classes للعناصر
+    const formElements = document.querySelectorAll('#userForm input, #userForm select, #userForm textarea');
+    formElements.forEach(element => {
+        if (!element.classList.contains('form-control')) {
+            element.classList.add('form-control');
+        }
+    });
+    
+    // إضافة class للـ textarea
+    const textarea = document.querySelector('#userForm textarea');
+    if (textarea) {
+        textarea.classList.add('form-control');
+        textarea.style.height = '100px';
+    }
+    
+    // إضافة class للـ select
+    const selects = document.querySelectorAll('#userForm select');
+    selects.forEach(select => {
+        select.classList.add('form-select');
+    });
+    
+    // إضافة class للـ input[type="date"]
+    const dateInputs = document.querySelectorAll('#userForm input[type="date"]');
+    dateInputs.forEach(input => {
+        input.classList.add('form-control');
+    });
+    
+    // إضافة class للـ input[type="file"]
+    const fileInputs = document.querySelectorAll('#userForm input[type="file"]');
+    fileInputs.forEach(input => {
+        input.classList.add('form-control');
+    });
+    
+    // إضافة class للـ input[type="checkbox"]
+    const checkboxes = document.querySelectorAll('#userForm input[type="checkbox"]');
+    checkboxes.forEach(input => {
+        input.classList.add('form-check-input');
+    });
+});
+</script>
+{% endblock %}

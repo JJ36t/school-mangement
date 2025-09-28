@@ -1,0 +1,426 @@
+{% extends 'base/base.html' %}
+
+{% block title %}قائمة الطلاب - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<!-- Header Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-1">
+                    <i class="bi bi-people text-primary me-2"></i>
+                    قائمة الطلاب
+                </h2>
+                <p class="text-muted mb-0">إدارة شاملة لجميع الطلاب في المدرسة</p>
+            </div>
+            <a href="{% url 'students:create_student' %}" class="btn btn-primary btn-lg shadow-sm">
+                <i class="bi bi-person-plus me-2"></i>إضافة طالب جديد
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-gradient-primary text-white shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ page_obj.paginator.count|default:0 }}</h4>
+                        <p class="card-text">إجمالي الطلاب</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-people display-4 opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-gradient-success text-white shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ active_students|default:0 }}</h4>
+                        <p class="card-text">طالب نشط</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-person-check display-4 opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-gradient-info text-white shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ male_students|default:0 }}</h4>
+                        <p class="card-text">طلاب ذكور</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-person display-4 opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-gradient-warning text-white shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ female_students|default:0 }}</h4>
+                        <p class="card-text">طالبات إناث</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-person-dress display-4 opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">الصف</label>
+                        <select class="form-select" id="gradeFilter">
+                            <option value="">جميع الصفوف</option>
+                            <option value="1">الصف الأول</option>
+                            <option value="2">الصف الثاني</option>
+                            <option value="3">الصف الثالث</option>
+                            <option value="4">الصف الرابع</option>
+                            <option value="5">الصف الخامس</option>
+                            <option value="6">الصف السادس</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">الجنس</label>
+                        <select class="form-select" id="genderFilter">
+                            <option value="">جميع الأجناس</option>
+                            <option value="male">ذكر</option>
+                            <option value="female">أنثى</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">الحالة</label>
+                        <select class="form-select" id="statusFilter">
+                            <option value="">جميع الحالات</option>
+                            <option value="active">نشط</option>
+                            <option value="inactive">غير نشط</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">&nbsp;</label>
+                        <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                            <i class="bi bi-arrow-clockwise me-2"></i>مسح الفلاتر
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white border-0">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h5 class="mb-0 text-dark">
+                            <i class="bi bi-list-ul text-primary me-2"></i>جميع الطلاب
+                        </h5>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="bi bi-search text-muted"></i>
+                            </span>
+                            <input type="text" class="form-control border-start-0" placeholder="البحث عن طالب..." id="searchInput">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                {% if page_obj %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="border-0">الطالب</th>
+                                    <th class="border-0">رقم الطالب</th>
+                                    <th class="border-0">الصف</th>
+                                    <th class="border-0">الفصل</th>
+                                    <th class="border-0">الجنس</th>
+                                    <th class="border-0">تاريخ التسجيل</th>
+                                    <th class="border-0">الحالة</th>
+                                    <th class="border-0 text-center">الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in page_obj %}
+                                <tr class="student-row" data-grade="{{ student.grade }}" data-gender="{{ student.gender }}" data-status="{% if student.is_active %}active{% else %}inactive{% endif %}">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="position-relative me-3">
+                                                {% if student.user.profile_picture %}
+                                                    <img src="{{ student.user.profile_picture.url }}" alt="صورة الطالب" class="rounded-circle shadow-sm" style="width: 50px; height: 50px; object-fit: cover;">
+                                                {% else %}
+                                                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 50px; height: 50px;">
+                                                        <i class="bi bi-person-fill text-white fs-5"></i>
+                                                    </div>
+                                                {% endif %}
+                                                {% if student.is_active %}
+                                                    <span class="position-absolute bottom-0 end-0 badge rounded-pill bg-success" style="width: 12px; height: 12px;"></span>
+                                                {% else %}
+                                                    <span class="position-absolute bottom-0 end-0 badge rounded-pill bg-danger" style="width: 12px; height: 12px;"></span>
+                                                {% endif %}
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1 fw-bold">{{ student.user.get_full_name }}</h6>
+                                                <small class="text-muted">{{ student.user.email }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border">{{ student.student_id }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info text-white">{{ student.get_grade_display }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary text-white">{{ student.section }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{% if student.gender == 'male' %}info{% else %}warning{% endif %} text-white">
+                                            <i class="bi bi-{% if student.gender == 'male' %}person{% else %}person-dress{% endif %} me-1"></i>
+                                            {{ student.get_gender_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="text-muted">{{ student.enrollment_date|date:"Y-m-d" }}</span>
+                                    </td>
+                                    <td>
+                                        {% if student.is_active %}
+                                            <span class="badge bg-success">نشط</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">غير نشط</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'students:student_detail' student.id %}" class="btn btn-sm btn-outline-info" title="عرض التفاصيل">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="{% url 'students:edit_student' student.id %}" class="btn btn-sm btn-outline-warning" title="تعديل">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a href="{% url 'students:delete_student' student.id %}" class="btn btn-sm btn-outline-danger" title="حذف">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    {% if page_obj.has_other_pages %}
+                        <div class="card-footer bg-white border-0">
+                            <nav aria-label="صفحات الطلاب">
+                                <ul class="pagination justify-content-center mb-0">
+                                    {% if page_obj.has_previous %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page=1">
+                                                <i class="bi bi-chevron-double-right"></i>
+                                            </a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                                <i class="bi bi-chevron-right"></i>
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                    
+                                    <li class="page-item active">
+                                        <span class="page-link bg-primary border-primary">
+                                            صفحة {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}
+                                        </span>
+                                    </li>
+                                    
+                                    {% if page_obj.has_next %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                                <i class="bi bi-chevron-left"></i>
+                                            </a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
+                                                <i class="bi bi-chevron-double-left"></i>
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <div class="mb-4">
+                            <i class="bi bi-person-x display-1 text-muted opacity-50"></i>
+                        </div>
+                        <h4 class="text-muted mb-3">لا يوجد طلاب</h4>
+                        <p class="text-muted mb-4">لم يتم إضافة أي طلاب بعد. ابدأ بإضافة أول طالب للمدرسة.</p>
+                        <a href="{% url 'students:create_student' %}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-person-plus me-2"></i>إضافة أول طالب
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const studentRows = document.querySelectorAll('.student-row');
+    const gradeFilter = document.getElementById('gradeFilter');
+    const genderFilter = document.getElementById('genderFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    
+    // Search functionality
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        filterRows();
+    });
+    
+    // Filter functionality
+    gradeFilter.addEventListener('change', filterRows);
+    genderFilter.addEventListener('change', filterRows);
+    statusFilter.addEventListener('change', filterRows);
+    
+    function filterRows() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedGrade = gradeFilter.value;
+        const selectedGender = genderFilter.value;
+        const selectedStatus = statusFilter.value;
+        
+        studentRows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            const grade = row.dataset.grade;
+            const gender = row.dataset.gender;
+            const status = row.dataset.status;
+            
+            const matchesSearch = text.includes(searchTerm);
+            const matchesGrade = !selectedGrade || grade === selectedGrade;
+            const matchesGender = !selectedGender || gender === selectedGender;
+            const matchesStatus = !selectedStatus || status === selectedStatus;
+            
+            if (matchesSearch && matchesGrade && matchesGender && matchesStatus) {
+                row.style.display = '';
+                row.classList.add('animate__animated', 'animate__fadeIn');
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+    
+    // Add hover effects
+    studentRows.forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.transition = 'all 0.3s ease';
+            this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+});
+
+function clearFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('gradeFilter').value = '';
+    document.getElementById('genderFilter').value = '';
+    document.getElementById('statusFilter').value = '';
+    
+    // Trigger filter update
+    document.getElementById('searchInput').dispatchEvent(new Event('input'));
+}
+</script>
+
+<style>
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.bg-gradient-success {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.bg-gradient-info {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.bg-gradient-warning {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.student-row {
+    transition: all 0.3s ease;
+}
+
+.student-row:hover {
+    background-color: #f8f9fa;
+}
+
+.table th {
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.badge {
+    font-size: 0.75rem;
+    padding: 0.5em 0.75em;
+}
+
+.btn-group .btn {
+    border-radius: 0.375rem;
+    margin: 0 2px;
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.form-label {
+    font-weight: 600;
+    color: #495057;
+}
+</style>
+{% endblock %}

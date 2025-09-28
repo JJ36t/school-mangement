@@ -1,0 +1,195 @@
+{% extends 'base/base.html' %}
+
+{% block title %}قائمة الصفوف - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-building me-2"></i>
+                قائمة الصفوف
+            </h2>
+            <a href="{% url 'subjects:create_class' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>إضافة صف جديد
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h5 class="mb-0">
+                            <i class="bi bi-list-ul me-2"></i>جميع الصفوف
+                        </h5>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="البحث عن صف..." id="searchInput">
+                            <button class="btn btn-outline-secondary" type="button">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if page_obj %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>اسم الصف</th>
+                                    <th>المرحلة</th>
+                                    <th>السعة</th>
+                                    <th>عدد الطلاب</th>
+                                    <th>المعلم المسؤول</th>
+                                    <th>الموقع</th>
+                                    <th>الحالة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for class_obj in page_obj %}
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <h6 class="mb-0">{{ class_obj.name }}</h6>
+                                            <small class="text-muted">{{ class_obj.section }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ class_obj.get_level_display }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ class_obj.capacity }} طالب</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{% if class_obj.students.count < class_obj.capacity %}success{% else %}warning{% endif %}">
+                                            {{ class_obj.students.count }} طالب
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if class_obj.teacher %}
+                                            <div class="d-flex align-items-center">
+                                                {% if class_obj.teacher.user.profile_picture %}
+                                                    <img src="{{ class_obj.teacher.user.profile_picture.url }}" alt="صورة المعلم" class="rounded-circle me-2" style="width: 30px; height: 30px; object-fit: cover;">
+                                                {% else %}
+                                                    <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px;">
+                                                        <i class="bi bi-person-fill text-white" style="font-size: 0.8rem;"></i>
+                                                    </div>
+                                                {% endif %}
+                                                <div>
+                                                    <h6 class="mb-0">{{ class_obj.teacher.user.get_full_name }}</h6>
+                                                    <small class="text-muted">{{ class_obj.teacher.specialization }}</small>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <span class="text-muted">غير مخصص</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="text-truncate d-inline-block" style="max-width: 150px;" title="{{ class_obj.location }}">
+                                            {{ class_obj.location|default:"غير محدد" }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if class_obj.is_active %}
+                                            <span class="badge bg-success">نشط</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">غير نشط</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'subjects:class_detail' class_obj.id %}" class="btn btn-sm btn-outline-info" title="عرض التفاصيل">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="{% url 'subjects:edit_class' class_obj.id %}" class="btn btn-sm btn-outline-warning" title="تعديل">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a href="{% url 'subjects:assign_teacher_to_class' class_obj.id %}" class="btn btn-sm btn-outline-primary" title="تخصيص معلم">
+                                                <i class="bi bi-person-plus"></i>
+                                            </a>
+                                            <a href="{% url 'subjects:delete_class' class_obj.id %}" class="btn btn-sm btn-outline-danger" title="حذف">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    {% if page_obj.has_other_pages %}
+                        <nav aria-label="صفحات الصفوف">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1">الأولى</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">السابقة</a>
+                                    </li>
+                                {% endif %}
+                                
+                                <li class="page-item active">
+                                    <span class="page-link">
+                                        صفحة {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}
+                                    </span>
+                                </li>
+                                
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">التالية</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">الأخيرة</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-building display-1 text-muted"></i>
+                        <h4 class="text-muted mt-3">لا توجد صفوف</h4>
+                        <p class="text-muted">لم يتم إضافة أي صفوف بعد.</p>
+                        <a href="{% url 'subjects:create_class' %}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-2"></i>إضافة أول صف
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const tableRows = document.querySelectorAll('tbody tr');
+        
+        tableRows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            if (text.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

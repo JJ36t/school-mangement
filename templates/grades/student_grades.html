@@ -1,0 +1,195 @@
+{% extends 'base/base.html' %}
+
+{% block title %}درجات الطالب - {{ student.user.get_full_name }} - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-person-badge me-2"></i>
+                درجات الطالب
+            </h2>
+            <a href="{% url 'grades:grade_list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-right me-2"></i>العودة للقائمة
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                {% if student.user.profile_picture %}
+                    <img src="{{ student.user.profile_picture.url }}" alt="صورة الطالب" class="img-fluid rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;">
+                {% else %}
+                    <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center mb-3 mx-auto" style="width: 120px; height: 120px;">
+                        <i class="bi bi-person-fill text-white" style="font-size: 3rem;"></i>
+                    </div>
+                {% endif %}
+                <h4>{{ student.user.get_full_name }}</h4>
+                <p class="text-muted">{{ student.student_id }}</p>
+                <span class="badge bg-primary fs-6">{{ student.get_grade_display }} - {{ student.section }}</span>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-graph-up me-2"></i>إحصائيات الأداء
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="border-end">
+                            <h4 class="text-primary mb-1">{{ total_grades }}</h4>
+                            <small class="text-muted">إجمالي الدرجات</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <h4 class="text-success mb-1">{{ average_percentage|floatformat:1 }}%</h4>
+                        <small class="text-muted">المتوسط</small>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>ممتاز (90%+)</span>
+                        <span class="badge bg-success">{{ excellent_count }}</span>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>جيد جداً (80-89%)</span>
+                        <span class="badge bg-info">{{ very_good_count }}</span>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>جيد (70-79%)</span>
+                        <span class="badge bg-warning">{{ good_count }}</span>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>مقبول (60-69%)</span>
+                        <span class="badge bg-secondary">{{ acceptable_count }}</span>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>ضعيف (<60%)</span>
+                        <span class="badge bg-danger">{{ weak_count }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-award me-2"></i>جميع الدرجات
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if grades %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>المادة</th>
+                                    <th>نوع الامتحان</th>
+                                    <th>الدرجة</th>
+                                    <th>النسبة</th>
+                                    <th>التقدير</th>
+                                    <th>التاريخ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for grade in grades %}
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <h6 class="mb-0">{{ grade.subject.name }}</h6>
+                                            <small class="text-muted">{{ grade.subject.code }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{% if grade.exam_type == 'midterm' %}warning{% elif grade.exam_type == 'final' %}danger{% elif grade.exam_type == 'practical' %}info{% else %}secondary{% endif %}">
+                                            {{ grade.get_exam_type_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold">{{ grade.score }} / {{ grade.max_score }}</span>
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="width: 80px; height: 20px;">
+                                            <div class="progress-bar bg-{% if grade.percentage >= 90 %}success{% elif grade.percentage >= 80 %}info{% elif grade.percentage >= 70 %}warning{% else %}danger{% endif %}" 
+                                                 role="progressbar" 
+                                                 style="width: {{ grade.percentage }}%"
+                                                 aria-valuenow="{{ grade.percentage }}" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="100">
+                                                {{ grade.percentage }}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{% if grade.grade_letter == 'A+' or grade.grade_letter == 'A' %}success{% elif grade.grade_letter == 'B+' or grade.grade_letter == 'B' %}info{% elif grade.grade_letter == 'C+' or grade.grade_letter == 'C' %}warning{% else %}danger{% endif %} fs-6">
+                                            {{ grade.grade_letter }}
+                                        </span>
+                                    </td>
+                                    <td>{{ grade.exam_date|date:"Y-m-d" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-award display-1 text-muted"></i>
+                        <h4 class="text-muted mt-3">لا توجد درجات</h4>
+                        <p class="text-muted">لم يتم إضافة أي درجات لهذا الطالب بعد.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if grades %}
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-bar-chart me-2"></i>تحليل الأداء حسب المادة
+                </h5>
+            </div>
+            <div class="card-body">
+                {% for subject_stats in subject_statistics %}
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <h6 class="mb-0">{{ subject_stats.subject.name }}</h6>
+                        <span class="badge bg-primary">{{ subject_stats.average|floatformat:1 }}%</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar bg-{% if subject_stats.average >= 90 %}success{% elif subject_stats.average >= 80 %}info{% elif subject_stats.average >= 70 %}warning{% else %}danger{% endif %}" 
+                             role="progressbar" 
+                             style="width: {{ subject_stats.average }}%"
+                             aria-valuenow="{{ subject_stats.average }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                        </div>
+                    </div>
+                    <small class="text-muted">{{ subject_stats.count }} درجة</small>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

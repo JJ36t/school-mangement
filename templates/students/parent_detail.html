@@ -1,0 +1,211 @@
+{% extends 'base/base.html' %}
+
+{% block title %}تفاصيل ولي الأمر - {{ parent.user.get_full_name }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-1">
+                    <i class="bi bi-person text-primary me-2"></i>
+                    تفاصيل ولي الأمر
+                </h2>
+                <p class="text-muted mb-0">{{ parent.user.get_full_name }}</p>
+            </div>
+            <div>
+                <a href="{% url 'students:edit_parent' parent.id %}" class="btn btn-warning me-2">
+                    <i class="bi bi-pencil me-2"></i>تعديل
+                </a>
+                <a href="{% url 'students:parent_list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-right me-2"></i>العودة للقائمة
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-person-circle me-2"></i>الملف الشخصي
+                </h5>
+            </div>
+            <div class="card-body text-center">
+                {% if parent.user.profile_picture %}
+                    <img src="{{ parent.user.profile_picture.url }}" class="rounded-circle mb-3" width="120" height="120" alt="صورة الملف الشخصي">
+                {% else %}
+                    <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 120px; height: 120px;">
+                        <i class="bi bi-person text-white" style="font-size: 3rem;"></i>
+                    </div>
+                {% endif %}
+                <h4 class="mb-1">{{ parent.user.get_full_name }}</h4>
+                <p class="text-muted mb-2">{{ parent.user.username }}</p>
+                <span class="badge bg-info fs-6">
+                    {{ parent.get_relationship_display }}
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-info-circle me-2"></i>معلومات ولي الأمر
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>اسم المستخدم:</strong></td>
+                                <td>{{ parent.user.username }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>البريد الإلكتروني:</strong></td>
+                                <td>{{ parent.user.email }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>رقم الهاتف:</strong></td>
+                                <td>{{ parent.user.phone|default:"غير محدد" }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>صلة القرابة:</strong></td>
+                                <td>
+                                    <span class="badge bg-info">
+                                        {{ parent.get_relationship_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>المهنة:</strong></td>
+                                <td>{{ parent.occupation|default:"غير محدد" }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>مكان العمل:</strong></td>
+                                <td>{{ parent.workplace|default:"غير محدد" }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>رقم الطوارئ:</strong></td>
+                                <td>{{ parent.emergency_contact }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>تاريخ الإنشاء:</strong></td>
+                                <td>{{ parent.created_at|date:"Y-m-d H:i" }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>آخر تحديث:</strong></td>
+                                <td>{{ parent.updated_at|date:"Y-m-d H:i" }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                {% if parent.user.address %}
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6 class="text-muted">العنوان:</h6>
+                        <p class="border p-3 rounded bg-light">{{ parent.user.address }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-people me-2"></i>الأبناء المرتبطين
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if parent.studentparent_set.all %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>اسم الطالب</th>
+                                    <th>رقم الطالب</th>
+                                    <th>الصف</th>
+                                    <th>نوع العلاقة</th>
+                                    <th>تاريخ الربط</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student_parent in parent.studentparent_set.all %}
+                                <tr>
+                                    <td>{{ student_parent.student.user.get_full_name }}</td>
+                                    <td>{{ student_parent.student.student_id }}</td>
+                                    <td>{{ student_parent.student.get_grade_display }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if student_parent.is_primary %}primary{% else %}secondary{% endif %}">
+                                            {% if student_parent.is_primary %}ولي أمر أساسي{% else %}ولي أمر ثانوي{% endif %}
+                                        </span>
+                                    </td>
+                                    <td>{{ student_parent.created_at|date:"Y-m-d" }}</td>
+                                    <td>
+                                        <a href="{% url 'students:student_detail' student_parent.student.id %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-people display-4 text-muted"></i>
+                        <h5 class="text-muted mt-3">لا يوجد أبناء مرتبطين</h5>
+                        <p class="text-muted">لم يتم ربط أي طلاب بهذا ولي الأمر</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-warning text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-gear me-2"></i>إجراءات ولي الأمر
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'students:edit_parent' parent.id %}" class="btn btn-warning w-100">
+                            <i class="bi bi-pencil me-2"></i>تعديل ولي الأمر
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'students:delete_parent' parent.id %}" class="btn btn-danger w-100">
+                            <i class="bi bi-trash me-2"></i>حذف ولي الأمر
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'students:parent_list' %}" class="btn btn-secondary w-100">
+                            <i class="bi bi-arrow-right me-2"></i>العودة للقائمة
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,246 @@
+{% extends 'base/base.html' %}
+
+{% block title %}ملخص المدفوعات والأقساط - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-bar-chart me-2"></i>
+                ملخص المدفوعات والأقساط
+            </h2>
+            <div>
+                <a href="{% url 'payments:export_payments' %}" class="btn btn-success me-2">
+                    <i class="bi bi-download me-2"></i>تصدير
+                </a>
+                <a href="{% url 'payments:payment_list' %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-right me-2"></i>العودة للقائمة
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="stats-card text-center">
+            <i class="bi bi-credit-card stats-icon"></i>
+            <div class="stats-number">{{ total_payments }}</div>
+            <div class="stats-label">إجمالي المدفوعات</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card text-center">
+            <i class="bi bi-people stats-icon"></i>
+            <div class="stats-number">{{ total_students }}</div>
+            <div class="stats-label">عدد الطلاب</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card text-center">
+            <i class="bi bi-currency-exchange stats-icon"></i>
+            <div class="stats-number">{{ total_amount }} دينار</div>
+            <div class="stats-label">إجمالي المبلغ</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card text-center">
+            <i class="bi bi-graph-up stats-icon"></i>
+            <div class="stats-number">{{ collection_rate|floatformat:1 }}%</div>
+            <div class="stats-label">معدل التحصيل</div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-pie-chart me-2"></i>توزيع المدفوعات
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>مدفوع</span>
+                        <div>
+                            <span class="badge bg-success me-2">{{ paid_count }}</span>
+                            <span class="text-muted">{{ paid_percentage|floatformat:1 }}%</span>
+                        </div>
+                    </div>
+                    <div class="progress mt-1" style="height: 8px;">
+                        <div class="progress-bar bg-success" style="width: {{ paid_percentage }}%"></div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>معلق</span>
+                        <div>
+                            <span class="badge bg-warning me-2">{{ pending_count }}</span>
+                            <span class="text-muted">{{ pending_percentage|floatformat:1 }}%</span>
+                        </div>
+                    </div>
+                    <div class="progress mt-1" style="height: 8px;">
+                        <div class="progress-bar bg-warning" style="width: {{ pending_percentage }}%"></div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>متأخر</span>
+                        <div>
+                            <span class="badge bg-danger me-2">{{ overdue_count }}</span>
+                            <span class="text-muted">{{ overdue_percentage|floatformat:1 }}%</span>
+                        </div>
+                    </div>
+                    <div class="progress mt-1" style="height: 8px;">
+                        <div class="progress-bar bg-danger" style="width: {{ overdue_percentage }}%"></div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>ملغي</span>
+                        <div>
+                            <span class="badge bg-secondary me-2">{{ cancelled_count }}</span>
+                            <span class="text-muted">{{ cancelled_percentage|floatformat:1 }}%</span>
+                        </div>
+                    </div>
+                    <div class="progress mt-1" style="height: 8px;">
+                        <div class="progress-bar bg-secondary" style="width: {{ cancelled_percentage }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-bar-chart me-2"></i>أفضل الطلاب في الدفع
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if top_payers %}
+                    <div class="list-group list-group-flush">
+                        {% for student in top_payers %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    {% if student.student.user.profile_picture %}
+                                        <img src="{{ student.student.user.profile_picture.url }}" alt="صورة الطالب" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                    {% else %}
+                                        <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                                            <i class="bi bi-person-fill text-white"></i>
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <h6 class="mb-0">{{ student.student.user.get_full_name }}</h6>
+                                        <small class="text-muted">{{ student.student.student_id }}</small>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-success fs-6">{{ student.paid_amount }} دينار</span>
+                                    <br>
+                                    <small class="text-muted">{{ student.paid_count }}/{{ student.total_count }}</small>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center">لا توجد بيانات كافية</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-credit-card me-2"></i>المدفوعات حسب النوع
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if payment_type_stats %}
+                    <div class="list-group list-group-flush">
+                        {% for type_stat in payment_type_stats %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0">{{ type_stat.payment_type_display }}</h6>
+                                    <small class="text-muted">{{ type_stat.total_count }} دفعة</small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-{% if type_stat.paid_percentage >= 80 %}success{% elif type_stat.paid_percentage >= 60 %}info{% elif type_stat.paid_percentage >= 40 %}warning{% else %}danger{% endif %} fs-6">
+                                        {{ type_stat.total_amount }} دينار
+                                    </span>
+                                    <br>
+                                    <small class="text-muted">{{ type_stat.paid_percentage|floatformat:1 }}% مدفوع</small>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center">لا توجد بيانات كافية</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-calendar me-2"></i>إحصائيات حسب التاريخ
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>هذا الأسبوع</span>
+                        <div>
+                            <span class="badge bg-primary me-2">{{ this_week_count }}</span>
+                            <span class="text-muted">{{ this_week_amount }} دينار</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>هذا الشهر</span>
+                        <div>
+                            <span class="badge bg-info me-2">{{ this_month_count }}</span>
+                            <span class="text-muted">{{ this_month_amount }} دينار</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>هذا الفصل</span>
+                        <div>
+                            <span class="badge bg-success me-2">{{ this_semester_count }}</span>
+                            <span class="text-muted">{{ this_semester_amount }} دينار</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>هذا العام</span>
+                        <div>
+                            <span class="badge bg-warning me-2">{{ this_year_count }}</span>
+                            <span class="text-muted">{{ this_year_amount }} دينار</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
