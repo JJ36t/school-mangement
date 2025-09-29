@@ -1,5 +1,5 @@
 """
-Django settings for school_management project - Production settings for Render.
+Django settings for school_management project - Optimized for Render deployment.
 """
 
 from .settings import *
@@ -21,16 +21,16 @@ ALLOWED_HOSTS = [
 ]
 
 # Database configuration for production
-DATABASES = {
-    'default': dj_database_url.parse(
-        os.environ.get('DATABASE_URL', 'sqlite:///db.sqlite3'),
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
-}
-
-# Fallback to SQLite if no DATABASE_URL is provided
-if not os.environ.get('DATABASE_URL'):
+if os.environ.get('DATABASE_URL'):
+    DATABASES = {
+        'default': dj_database_url.parse(
+            os.environ.get('DATABASE_URL'),
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
+else:
+    # Fallback to SQLite for testing
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -57,12 +57,6 @@ SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 
-# HTTPS settings (uncomment when you have SSL)
-# SECURE_SSL_REDIRECT = True
-# SECURE_HSTS_SECONDS = 31536000
-# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-# SECURE_HSTS_PRELOAD = True
-
 # CSRF settings for production
 CSRF_COOKIE_SECURE = False  # Set to True when using HTTPS
 CSRF_COOKIE_HTTPONLY = True
@@ -75,12 +69,12 @@ SESSION_COOKIE_SAMESITE = 'Strict'
 
 # CORS settings for production
 CORS_ALLOWED_ORIGINS = [
-    "https://your-app-name.onrender.com",  # Replace with your actual Render URL
+    "https://school-management-system.onrender.com",  # Replace with your actual Render URL
 ]
 
 # CSRF trusted origins
 CSRF_TRUSTED_ORIGINS = [
-    "https://your-app-name.onrender.com",  # Replace with your actual Render URL
+    "https://school-management-system.onrender.com",  # Replace with your actual Render URL
 ]
 
 # Logging configuration
@@ -103,12 +97,3 @@ LOGGING = {
         },
     },
 }
-
-# Email configuration (optional - for notifications)
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@yourdomain.com')
