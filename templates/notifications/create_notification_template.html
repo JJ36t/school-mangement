@@ -1,0 +1,92 @@
+{% extends 'base/base.html' %}
+
+{% block title %}إنشاء قالب إشعار جديد - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-plus-circle me-2"></i>
+                إنشاء قالب إشعار جديد
+            </h2>
+            <a href="{% url 'notifications:notification_template_list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-right me-2"></i>العودة للقائمة
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-file-text me-2"></i>معلومات القالب
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.name.id_for_label }}" class="form-label">اسم القالب *</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                            <div class="text-danger">{{ form.name.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.notification_type.id_for_label }}" class="form-label">نوع الإشعار *</label>
+                        {{ form.notification_type }}
+                        {% if form.notification_type.errors %}
+                            <div class="text-danger">{{ form.notification_type.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.title_template.id_for_label }}" class="form-label">قالب العنوان *</label>
+                        {{ form.title_template }}
+                        {% if form.title_template.errors %}
+                            <div class="text-danger">{{ form.title_template.errors }}</div>
+                        {% endif %}
+                        <div class="form-text">استخدم {student_name} أو {teacher_name} أو {notification_type} كمتغيرات</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.message_template.id_for_label }}" class="form-label">قالب الرسالة *</label>
+                        {{ form.message_template }}
+                        {% if form.message_template.errors %}
+                            <div class="text-danger">{{ form.message_template.errors }}</div>
+                        {% endif %}
+                        <div class="form-text">استخدم {student_name} أو {teacher_name} أو {notification_type} كمتغيرات</div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'notifications:notification_template_list' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-right me-2"></i>إلغاء
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save me-2"></i>حفظ القالب
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-body">
+                <h6 class="card-title">
+                    <i class="bi bi-info-circle me-2"></i>معلومات مفيدة
+                </h6>
+                <ul class="list-unstyled mb-0">
+                    <li><i class="bi bi-check-circle text-success me-2"></i>يمكن استخدام المتغيرات في القوالب</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i>المتغيرات: {student_name}, {teacher_name}, {notification_type}</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i>يمكن إعادة استخدام القوالب لإنشاء إشعارات متعددة</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

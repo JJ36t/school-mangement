@@ -1,0 +1,154 @@
+{% extends 'base/base.html' %}
+
+{% block title %}تفاصيل سجل الإشعار - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-list-check me-2"></i>
+                تفاصيل سجل الإشعار
+            </h2>
+            <a href="{% url 'notifications:notification_log_list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-right me-2"></i>العودة للسجلات
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-list-check me-2"></i>تفاصيل السجل
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>الإشعار:</strong>
+                        <p class="text-muted">{{ log.notification.title }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>المستقبل:</strong>
+                        <p class="text-muted">{{ log.recipient.get_full_name|default:log.recipient.username }}</p>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>حالة التسليم:</strong>
+                        {% if log.delivery_status == 'sent' %}
+                            <span class="badge bg-primary">تم الإرسال</span>
+                        {% elif log.delivery_status == 'delivered' %}
+                            <span class="badge bg-success">تم التسليم</span>
+                        {% elif log.delivery_status == 'read' %}
+                            <span class="badge bg-info">تم القراءة</span>
+                        {% elif log.delivery_status == 'failed' %}
+                            <span class="badge bg-danger">فشل الإرسال</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>تاريخ التسليم:</strong>
+                        <p class="text-muted">
+                            {% if log.delivery_date %}
+                                {{ log.delivery_date|date:"Y-m-d H:i" }}
+                            {% else %}
+                                لم يتم التسليم بعد
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>تاريخ القراءة:</strong>
+                        <p class="text-muted">
+                            {% if log.read_date %}
+                                {{ log.read_date|date:"Y-m-d H:i" }}
+                            {% else %}
+                                لم يتم القراءة بعد
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>تاريخ الإنشاء:</strong>
+                        <p class="text-muted">{{ log.created_at|date:"Y-m-d H:i" }}</p>
+                    </div>
+                </div>
+                
+                {% if log.error_message %}
+                    <div class="mb-3">
+                        <strong>رسالة الخطأ:</strong>
+                        <div class="alert alert-danger">
+                            {{ log.error_message }}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-bell me-2"></i>تفاصيل الإشعار
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>العنوان:</strong>
+                        <p class="text-muted">{{ log.notification.title }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>النوع:</strong>
+                        <span class="badge bg-info">{{ log.notification.get_notification_type_display }}</span>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>الرسالة:</strong>
+                    <div class="bg-light p-3 rounded">
+                        {{ log.notification.message }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-gear me-2"></i>الإجراءات
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'notifications:notification_detail' notification_id=log.notification.id %}" class="btn btn-primary">
+                        <i class="bi bi-bell me-2"></i>عرض الإشعار
+                    </a>
+                    <a href="{% url 'notifications:notification_log_list' %}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-right me-2"></i>العودة للسجلات
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-body">
+                <h6 class="card-title">
+                    <i class="bi bi-info-circle me-2"></i>معلومات مفيدة
+                </h6>
+                <ul class="list-unstyled mb-0">
+                    <li><i class="bi bi-check-circle text-success me-2"></i>يتم تسجيل كل محاولة إرسال</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i>يمكن تتبع حالة التسليم</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i>يتم تسجيل الأخطاء إن وجدت</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

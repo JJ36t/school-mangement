@@ -1,0 +1,125 @@
+{% extends 'base/base.html' %}
+
+{% block title %}قوالب الإشعارات - نظام إدارة المدارس{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-file-text me-2"></i>
+                قوالب الإشعارات
+            </h2>
+            <a href="{% url 'notifications:create_notification_template' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>إنشاء قالب جديد
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-list me-2"></i>قائمة القوالب
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if page_obj %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>اسم القالب</th>
+                                    <th>نوع الإشعار</th>
+                                    <th>الحالة</th>
+                                    <th>تاريخ الإنشاء</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for template in page_obj %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-file-text me-2"></i>
+                                                <div>
+                                                    <h6 class="mb-0">{{ template.name }}</h6>
+                                                    <small class="text-muted">{{ template.title_template|truncatechars:50 }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">{{ template.get_notification_type_display }}</span>
+                                        </td>
+                                        <td>
+                                            {% if template.is_active %}
+                                                <span class="badge bg-success">نشط</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">غير نشط</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ template.created_at|date:"Y-m-d" }}</td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="{% url 'notifications:notification_template_detail' template_id=template.id %}" class="btn btn-outline-primary">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <a href="{% url 'notifications:edit_notification_template' template_id=template.id %}" class="btn btn-outline-warning">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <a href="{% url 'notifications:delete_notification_template' template_id=template.id %}" class="btn btn-outline-danger">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    {% if page_obj.has_other_pages %}
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1">الأولى</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">السابقة</a>
+                                    </li>
+                                {% endif %}
+                                
+                                <li class="page-item active">
+                                    <span class="page-link">{{ page_obj.number }} من {{ page_obj.paginator.num_pages }}</span>
+                                </li>
+                                
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">التالية</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">الأخيرة</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-file-text display-1 text-muted"></i>
+                        <h4 class="text-muted mt-3">لا توجد قوالب إشعارات</h4>
+                        <p class="text-muted">ابدأ بإنشاء قالب إشعار جديد</p>
+                        <a href="{% url 'notifications:create_notification_template' %}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-2"></i>إنشاء قالب جديد
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

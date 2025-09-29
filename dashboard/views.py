@@ -6,6 +6,7 @@ from teachers.models import Teacher
 from grades.models import Grade
 from attendance.models import Attendance
 from payments.models import Payment
+from notifications.models import Notification
 
 
 @login_required
@@ -45,6 +46,9 @@ def admin_dashboard_view(request):
     recent_students = Student.objects.filter(is_active=True).order_by('-created_at')[:5]
     recent_teachers = Teacher.objects.filter(is_active=True).order_by('-created_at')[:5]
     
+    # Get notifications
+    recent_notifications = Notification.objects.filter(is_sent=True).order_by('-sent_date')[:5]
+    
     context = {
         'total_students': total_students,
         'total_teachers': total_teachers,
@@ -52,6 +56,7 @@ def admin_dashboard_view(request):
         'total_payments': total_payments,
         'recent_students': recent_students,
         'recent_teachers': recent_teachers,
+        'recent_notifications': recent_notifications,
     }
     
     return render(request, 'dashboard/admin_dashboard.html', context)
@@ -75,10 +80,14 @@ def teacher_dashboard_view(request):
     subjects = []  # Will be implemented in subjects module
     students = []  # Will be implemented when subjects are assigned
     
+    # Get teacher's notifications
+    my_notifications = request.user.received_notifications.filter(is_sent=True).order_by('-sent_date')[:5]
+    
     context = {
         'teacher': teacher,
         'subjects': subjects,
         'students': students,
+        'my_notifications': my_notifications,
     }
     
     return render(request, 'dashboard/teacher_dashboard.html', context)
@@ -102,10 +111,14 @@ def student_dashboard_view(request):
     grades = []  # Will be implemented in grades module
     attendance = []  # Will be implemented in attendance module
     
+    # Get student's notifications
+    my_notifications = request.user.received_notifications.filter(is_sent=True).order_by('-sent_date')[:5]
+    
     context = {
         'student': student,
         'grades': grades,
         'attendance': attendance,
+        'my_notifications': my_notifications,
     }
     
     return render(request, 'dashboard/student_dashboard.html', context)

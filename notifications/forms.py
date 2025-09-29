@@ -9,12 +9,47 @@ class NotificationForm(forms.ModelForm):
     """
     Notification form
     """
+    # Additional fields for the template
+    recipient_type = forms.ChoiceField(
+        choices=[
+            ('all', 'جميع المستخدمين'),
+            ('students', 'الطلاب فقط'),
+            ('teachers', 'المعلمين فقط'),
+            ('admins', 'المدراء فقط'),
+            ('custom', 'محدد'),
+        ],
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label='نوع المستقبلين'
+    )
+    
+    channel = forms.ChoiceField(
+        choices=[
+            ('system', 'النظام'),
+            ('email', 'البريد الإلكتروني'),
+            ('sms', 'رسالة نصية'),
+        ],
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label='قناة الإرسال'
+    )
+    
+    scheduled_at = forms.DateTimeField(
+        required=False,
+        widget=forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+        label='تاريخ الإرسال المجدول'
+    )
+    
+    attachments = forms.FileField(
+        required=False,
+        widget=forms.FileInput(attrs={'class': 'form-control'}),
+        label='مرفقات'
+    )
+    
     class Meta:
         model = Notification
         fields = ['title', 'message', 'notification_type', 'priority', 'recipients', 'is_scheduled', 'scheduled_date']
         widgets = {
-            'message': forms.Textarea(attrs={'rows': 5}),
-            'scheduled_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'message': forms.Textarea(attrs={'rows': 5, 'class': 'form-control'}),
+            'scheduled_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
         }
     
     def __init__(self, *args, **kwargs):
@@ -37,6 +72,7 @@ class NotificationForm(forms.ModelForm):
         
         # Make some fields optional
         self.fields['scheduled_date'].required = False
+        self.fields['recipients'].required = False
 
 
 class NotificationTemplateForm(forms.ModelForm):

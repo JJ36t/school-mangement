@@ -27,4 +27,8 @@ urlpatterns = [
     # User Notifications
     path('my-notifications/', views.my_notifications_view, name='my_notifications'),
     path('unread-count/', views.unread_notifications_count_view, name='unread_notifications_count'),
+    
+    # API Endpoints
+    path('api/unread/', views.unread_notifications_api_view, name='unread_notifications_api'),
+    path('<int:notification_id>/mark-read-api/', views.mark_notification_read_api_view, name='mark_notification_read_api'),
 ]

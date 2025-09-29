@@ -12,7 +12,11 @@ def notification_list_view(request):
     """
     Notification list view
     """
-    notifications = Notification.objects.all().order_by('-created_at')
+    # Show all notifications for admins, only user's notifications for others
+    if request.user.role == 'admin':
+        notifications = Notification.objects.all().order_by('-created_at')
+    else:
+        notifications = request.user.received_notifications.filter(is_sent=True).order_by('-sent_date', '-created_at')
     
     # Pagination
     paginator = Paginator(notifications, 20)
@@ -28,12 +32,50 @@ def create_notification_view(request):
     Create notification view
     """
     if request.method == 'POST':
-        form = NotificationForm(request.POST)
+        form = NotificationForm(request.POST, request.FILES)
         if form.is_valid():
             notification = form.save(commit=False)
             notification.sender = request.user
+            
+            # Handle recipient_type logic
+            recipient_type = form.cleaned_data.get('recipient_type')
+            if recipient_type == 'all':
+                from django.contrib.auth import get_user_model
+                User = get_user_model()
+                notification.save()
+                notification.recipients.set(User.objects.all())
+            elif recipient_type == 'students':
+                from django.contrib.auth import get_user_model
+                User = get_user_model()
+                notification.save()
+                notification.recipients.set(User.objects.filter(user_type='student'))
+            elif recipient_type == 'teachers':
+                from django.contrib.auth import get_user_model
+                User = get_user_model()
+                notification.save()
+                notification.recipients.set(User.objects.filter(user_type='teacher'))
+            elif recipient_type == 'admins':
+                from django.contrib.auth import get_user_model
+                User = get_user_model()
+                notification.save()
+                notification.recipients.set(User.objects.filter(user_type='admin'))
+            else:  # custom
+                notification.save()
+                form.save_m2m()  # Save many-to-many relationships
+            
+            # Handle scheduled notification
+            scheduled_at = form.cleaned_data.get('scheduled_at')
+            if scheduled_at:
+                notification.is_scheduled = True
+                notification.scheduled_date = scheduled_at
+            else:
+                # Mark as sent immediately if not scheduled
+                notification.is_sent = True
+                from django.utils import timezone
+                notification.sent_date = timezone.now()
+            
             notification.save()
-            form.save_m2m()  # Save many-to-many relationships
+            
             messages.success(request, f'تم إنشاء الإشعار بنجاح')
             return redirect('notifications:notification_detail', notification_id=notification.id)
     else:
@@ -243,3 +285,42 @@ def unread_notifications_count_view(request):
     """
     count = request.user.received_notifications.filter(is_read=False).count()
     return JsonResponse({'count': count})
+
+
+@login_required
+def unread_notifications_api_view(request):
+    """
+    Get unread notifications for popup display (AJAX)
+    """
+    notifications = request.user.received_notifications.filter(
+        is_read=False, 
+        is_sent=True
+    ).order_by('-sent_date', '-created_at')[:5]
+    
+    notifications_data = []
+    for notification in notifications:
+        notifications_data.append({
+            'id': notification.id,
+            'title': notification.title,
+            'message': notification.message,
+            'priority': notification.priority,
+            'notification_type': notification.notification_type,
+            'sent_date': notification.sent_date.isoformat() if notification.sent_date else notification.created_at.isoformat(),
+            'created_at': notification.created_at.isoformat(),
+        })
+    
+    return JsonResponse({'notifications': notifications_data})
+
+
+@login_required
+def mark_notification_read_api_view(request, notification_id):
+    """
+    Mark notification as read (AJAX)
+    """
+    try:
+        notification = get_object_or_404(Notification, id=notification_id, recipients=request.user)
+        notification.is_read = True
+        notification.save()
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
