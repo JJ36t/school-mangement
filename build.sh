@@ -1,18 +1,15 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Build script for Render deployment
 
 echo "Starting build process..."
 
-# Upgrade pip
-pip install --upgrade pip
-
-# Install setuptools first
-pip install setuptools>=65.0.0
-
-# Install requirements
+# Install dependencies
 pip install -r requirements.txt
 
 # Collect static files
 python manage.py collectstatic --noinput
 
-echo "Build completed successfully!"
+# Run migrations
+python manage.py migrate
+
+echo "Build process completed!"

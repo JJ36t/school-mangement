@@ -2,9 +2,9 @@
 Django settings for school_management project - Production settings for Render.
 """
 
-from .settings import *
 import os
 import dj_database_url
+from .settings import *
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -75,12 +75,14 @@ SESSION_COOKIE_SAMESITE = 'Strict'
 
 # CORS settings for production
 CORS_ALLOWED_ORIGINS = [
-    "https://your-app-name.onrender.com",  # Replace with your actual Render URL
+    "https://school-management-system.onrender.com",
+    "https://*.onrender.com",
 ]
 
 # CSRF trusted origins
 CSRF_TRUSTED_ORIGINS = [
-    "https://your-app-name.onrender.com",  # Replace with your actual Render URL
+    "https://school-management-system.onrender.com",
+    "https://*.onrender.com",
 ]
 
 # Logging configuration

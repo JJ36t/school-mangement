@@ -2,9 +2,9 @@
 Django settings for school_management project - Optimized for Render deployment.
 """
 
-from .settings import *
 import os
 import dj_database_url
+from .settings import *
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False

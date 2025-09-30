@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,6 +31,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     '.onrender.com',
     'school-management-system.onrender.com',
+    '*',  # Allow all hosts for deployment flexibility
 ]
 
 
@@ -95,8 +97,9 @@ WSGI_APPLICATION = 'school_management.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 # Database configuration
+import dj_database_url
+
 if os.environ.get('DATABASE_URL'):
-    import dj_database_url
     DATABASES = {
         'default': dj_database_url.parse(
             os.environ.get('DATABASE_URL'),
