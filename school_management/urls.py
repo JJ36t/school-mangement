@@ -19,6 +19,7 @@ from django.urls import path, include
 from django.shortcuts import redirect
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import HttpResponse
 
 # تخصيص واجهة الإدارة
 admin.site.site_header = "نظام إدارة المدرسة"
@@ -29,8 +30,26 @@ def root_redirect(request):
     """Redirect root URL to dashboard"""
     return redirect('dashboard:dashboard')
 
+def debug_view(request):
+    """Debug view to test Django functionality"""
+    try:
+        return HttpResponse(f"""
+        <h1>Django Debug</h1>
+        <p>Django is working!</p>
+        <p>Settings: {settings.DATABASES}</p>
+        <p>Debug: {settings.DEBUG}</p>
+        <p>Installed Apps: {len(settings.INSTALLED_APPS)}</p>
+        <p>Template Dirs: {settings.TEMPLATES[0]['DIRS']}</p>
+        <p><a href="/accounts/login/">Login Page</a></p>
+        """)
+    except Exception as e:
+        return HttpResponse(f"<h1>Error</h1><p>{str(e)}</p>")
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    
+    # Debug URL
+    path('debug/', debug_view, name='debug'),
     
     # App URLs
     path('dashboard/', include('dashboard.urls')),

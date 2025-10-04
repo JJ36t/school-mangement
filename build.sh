@@ -6,10 +6,7 @@ echo "Starting build process..."
 # Install dependencies
 pip install -r requirements.txt
 
-# Collect static files
-python manage.py collectstatic --noinput
-
-# Run migrations
-python manage.py migrate
+# Run production setup
+python manage_production.py
 
 echo "Build process completed!"

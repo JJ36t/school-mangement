@@ -247,3 +247,32 @@ def delete_teacher_subject_view(request, assignment_id):
         return redirect('subjects:teacher_subject_list')
     
     return render(request, 'subjects/delete_teacher_subject.html', {'assignment': assignment})
+
+
+@login_required
+def assign_teacher_to_class_view(request, class_id):
+    """
+    Assign teacher to class view
+    """
+    class_obj = get_object_or_404(Class, id=class_id)
+    
+    if request.method == 'POST':
+        teacher_id = request.POST.get('teacher_id')
+        if teacher_id:
+            from teachers.models import Teacher
+            teacher = get_object_or_404(Teacher, id=teacher_id)
+            class_obj.teacher = teacher
+            class_obj.save()
+            messages.success(request, f'تم تعيين المعلم {teacher.user.get_full_name()} للصف {class_obj.name} بنجاح')
+            return redirect('subjects:class_detail', class_id=class_id)
+        else:
+            messages.error(request, 'يرجى اختيار معلم')
+    
+    # Get all teachers for selection
+    from teachers.models import Teacher
+    teachers = Teacher.objects.filter(is_active=True)
+    
+    return render(request, 'subjects/assign_teacher_to_class.html', {
+        'class_obj': class_obj,
+        'teachers': teachers
+    })

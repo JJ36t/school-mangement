@@ -1,0 +1,75 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}تخصيص معلم للصف{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="bi bi-person-plus"></i>
+                        تخصيص معلم للصف: {{ class_obj.name }}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>معلومات الصف:</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <strong>اسم الصف:</strong> {{ class_obj.name }}
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>المستوى:</strong> {{ class_obj.get_class_level_display }}
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>الموقع:</strong> {{ class_obj.class_location }}
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>المعلم الحالي:</strong> 
+                                    {% if class_obj.teacher %}
+                                        {{ class_obj.teacher.user.get_full_name }}
+                                    {% else %}
+                                        <span class="text-muted">لم يتم تعيين معلم</span>
+                                    {% endif %}
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="teacher_id" class="form-label">اختر المعلم:</label>
+                                    <select class="form-select" id="teacher_id" name="teacher_id" required>
+                                        <option value="">-- اختر معلم --</option>
+                                        {% for teacher in teachers %}
+                                            <option value="{{ teacher.id }}" 
+                                                    {% if class_obj.teacher and class_obj.teacher.id == teacher.id %}selected{% endif %}>
+                                                {{ teacher.user.get_full_name }} - {{ teacher.specialization }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <a href="{% url 'subjects:class_detail' class_obj.id %}" class="btn btn-secondary me-md-2">
+                                        <i class="bi bi-arrow-left"></i>
+                                        إلغاء
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-check-lg"></i>
+                                        تعيين المعلم
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

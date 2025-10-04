@@ -17,20 +17,20 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     '.onrender.com',  # Render domain
-    # Add your custom domain here when you have one
+    '*',  # Allow all hosts for deployment flexibility
 ]
 
 # Database configuration for production
-DATABASES = {
-    'default': dj_database_url.parse(
-        os.environ.get('DATABASE_URL', 'sqlite:///db.sqlite3'),
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
-}
-
-# Fallback to SQLite if no DATABASE_URL is provided
-if not os.environ.get('DATABASE_URL'):
+if os.environ.get('DATABASE_URL'):
+    DATABASES = {
+        'default': dj_database_url.parse(
+            os.environ.get('DATABASE_URL'),
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
+else:
+    # Fallback to SQLite if no DATABASE_URL is provided
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -48,6 +48,10 @@ MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 # WhiteNoise configuration
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+# WhiteNoise settings
+WHITENOISE_USE_FINDERS = True
+WHITENOISE_AUTOREFRESH = True
+
 # Media files configuration
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -56,6 +60,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
+
+# Additional security settings
+SECURE_HSTS_SECONDS = 0  # Disable HSTS for now
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_HSTS_PRELOAD = False
 
 # HTTPS settings (uncomment when you have SSL)
 # SECURE_SSL_REDIRECT = True
@@ -79,6 +88,9 @@ CORS_ALLOWED_ORIGINS = [
     "https://*.onrender.com",
 ]
 
+# Allow all origins for development
+CORS_ALLOW_ALL_ORIGINS = True
+
 # CSRF trusted origins
 CSRF_TRUSTED_ORIGINS = [
     "https://school-management-system.onrender.com",
@@ -89,18 +101,31 @@ CSRF_TRUSTED_ORIGINS = [
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+    },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
         },
     },
     'root': {
         'handlers': ['console'],
+        'level': 'INFO',
     },
     'loggers': {
         'django': {
             'handlers': ['console'],
             'level': 'INFO',
+            'propagate': False,
+        },
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'ERROR',
             'propagate': False,
         },
     },

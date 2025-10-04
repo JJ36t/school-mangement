@@ -3,8 +3,6 @@ from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from django.contrib.auth import get_user_model
 from .models import User
 
-User = get_user_model()
-
 
 class UserRegistrationForm(UserCreationForm):
     """

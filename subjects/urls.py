@@ -18,6 +18,7 @@ urlpatterns = [
     path('classes/<int:class_id>/', views.class_detail_view, name='class_detail'),
     path('classes/<int:class_id>/edit/', views.edit_class_view, name='edit_class'),
     path('classes/<int:class_id>/delete/', views.delete_class_view, name='delete_class'),
+    path('classes/<int:class_id>/assign-teacher/', views.assign_teacher_to_class_view, name='assign_teacher_to_class'),
     
     # Teacher-Subject Assignment URLs
     path('assignments/', views.teacher_subject_list_view, name='teacher_subject_list'),
