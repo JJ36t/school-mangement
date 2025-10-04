@@ -3,21 +3,24 @@
 
 echo "Starting build process..."
 
+# Set environment variables
+export DJANGO_SETTINGS_MODULE=school_management.settings_production
+
 # Install dependencies
 echo "Installing Python dependencies..."
 pip install -r requirements.txt
 
+# Run migrations first
+echo "Running database migrations..."
+python manage.py migrate --noinput
+
 # Collect static files
 echo "Collecting static files..."
-python manage.py collectstatic --noinput --settings=school_management.settings_production
-
-# Run migrations
-echo "Running database migrations..."
-python manage.py migrate --settings=school_management.settings_production
+python manage.py collectstatic --noinput
 
 # Create superuser if it doesn't exist
 echo "Creating superuser..."
-python manage.py shell --settings=school_management.settings_production << EOF
+python manage.py shell << EOF
 from django.contrib.auth import get_user_model
 User = get_user_model()
 if not User.objects.filter(username='admin').exists():
