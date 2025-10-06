@@ -282,12 +282,14 @@
                             <a class="nav-link" href="{% url 'notifications:my_notifications' %}">
                                 <i class="bi bi-bell me-2"></i>إشعاراتي
                             </a>
-                            <a class="nav-link" href="{% url 'grades:student_grades' user.student.id %}">
-                                <i class="bi bi-award me-2"></i>درجاتي
-                            </a>
-                            <a class="nav-link" href="{% url 'attendance:student_attendance' user.student.id %}">
-                                <i class="bi bi-calendar-check me-2"></i>حضوري
-                            </a>
+                            {% if user.student %}
+                                <a class="nav-link" href="{% url 'grades:student_grades' user.student.id %}">
+                                    <i class="bi bi-award me-2"></i>درجاتي
+                                </a>
+                                <a class="nav-link" href="{% url 'attendance:student_attendance' user.student.id %}">
+                                    <i class="bi bi-calendar-check me-2"></i>حضوري
+                                </a>
+                            {% endif %}
                         {% elif user.role == 'parent' %}
                             <a class="nav-link" href="{% url 'dashboard:parent_dashboard' %}">
                                 <i class="bi bi-speedometer2 me-2"></i>لوحة التحكم

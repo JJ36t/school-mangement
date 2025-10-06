@@ -166,7 +166,8 @@ def teacher_dashboard_view(request):
     students = []  # Will be implemented when subjects are assigned
     
     # Get teacher's notifications
-    my_notifications = request.user.received_notifications.filter(is_sent=True).order_by('-sent_date')[:5]
+    from notifications.models import Notification
+    my_notifications = Notification.objects.filter(recipients=request.user, is_sent=True).order_by('-sent_date')[:5]
     
     context = {
         'teacher': teacher,
@@ -197,7 +198,8 @@ def student_dashboard_view(request):
     attendance = []  # Will be implemented in attendance module
     
     # Get student's notifications
-    my_notifications = request.user.received_notifications.filter(is_sent=True).order_by('-sent_date')[:5]
+    from notifications.models import Notification
+    my_notifications = Notification.objects.filter(recipients=request.user, is_sent=True).order_by('-sent_date')[:5]
     
     context = {
         'student': student,

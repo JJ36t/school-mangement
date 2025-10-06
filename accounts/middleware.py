@@ -29,8 +29,8 @@ class RoleBasedAccessMiddleware:
             # Define role-based access rules
             role_access_rules = {
                 'admin': [
-                    '/dashboard/admin/',
-                    '/accounts/users/',
+                    '/dashboard/',
+                    '/accounts/',
                     '/students/',
                     '/teachers/',
                     '/subjects/',
@@ -40,15 +40,26 @@ class RoleBasedAccessMiddleware:
                     '/notifications/',
                 ],
                 'teacher': [
-                    '/dashboard/teacher/',
+                    '/dashboard/',
+                    '/accounts/profile/',
+                    '/accounts/change-password/',
                     '/grades/',
                     '/attendance/',
+                    '/notifications/',
                 ],
                 'student': [
-                    '/dashboard/student/',
+                    '/dashboard/',
+                    '/accounts/profile/',
+                    '/accounts/change-password/',
+                    '/grades/',
+                    '/attendance/',
+                    '/notifications/',
                 ],
                 'parent': [
-                    '/dashboard/parent/',
+                    '/dashboard/',
+                    '/accounts/profile/',
+                    '/accounts/change-password/',
+                    '/notifications/',
                 ]
             }
             
